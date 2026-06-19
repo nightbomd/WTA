@@ -5,6 +5,8 @@
   --card-bg: #231F1F;
   --span-red: #7a2e2ea2;
   --color-red: #D76262;
+  --color-yellow: #D7B762;
+  --color-green: #62D76A;
 }
 .progress-header {
   display: flex;

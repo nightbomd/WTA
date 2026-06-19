@@ -1,15 +1,15 @@
-function ProgressBar({ value }) {
+function ProgressBar({ text, value, bg}) {
   return (
     <div className="progress-container my-3">
       <div className="progress-header">
-        <span>Progress:</span>
-        <span style={{ color: "var(--color-blue)" }}>{value}%</span>
+        <span>{text}</span>
+        <span>{value}%</span>
       </div>
 
       <div className="progress-box">
         <div
           className="progress-bar"
-          style={{ width: `${value}%`, background: "var(--color-blue)" }}
+          style={{ width: `${value}%`, background: bg }}
         />
       </div>
     </div>
