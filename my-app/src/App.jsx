@@ -5,14 +5,26 @@ import heroImg from './assets/hero.png'
 import ProgressBar from './Components/progressBar'
 import './App.css'
 import DonutComponent from './Components/donut'
+import Button from "./Components/btn"
 
 function App() {
-
+  const [workoutCreated, setWorkoutCreated] = useState(false);
   return (
     <>
       <body style={{ background: 'var(--bg-color)' }} className="p-5">
-        <header>
-          <h1 className="mb-5" style={{ fontSize: 'var(--font-size-header)' }}><span className="text-light mb-4">Welcome,</span> <br /><span style={{ color: 'var(--color-blue)' }}>Marcus!</span></h1>
+        <header className="row">
+          <div className="col-sm-12 col-md-6">
+            <h1 className="mb-5" style={{ fontSize: 'var(--font-size-header)' }}><span className="text-light mb-4">Welcome,</span> <br /><span style={{ color: 'var(--color-blue)' }}>Marcus!</span></h1>
+          </div>
+          <div className="create-workout col-sm-12 col-md-6">
+            {/* Conditionally render the entire block only if workoutCreated is false */}
+            {!workoutCreated && (
+              <>
+                <p className="fs-1 text-light">No workout Currently</p>
+                <Button text="Create a workout" onClick={() => setWorkoutCreated(true)} />
+              </>
+            )}
+          </div>  
         </header>
         <main>
           <div className="row g-5">
@@ -98,9 +110,38 @@ function App() {
                 <h3 className="text-light">Carbs: 200g</h3>
                 <ProgressBar text="150/200g" value={65} bg="var(--color-yellow)" />
               </div>
-               <div className="carbs">
+              <div className="carbs">
                 <h3 className="text-light">Fats: 48g</h3>
                 <ProgressBar text="16/48g" value={32} bg="var(--color-green)" />
+              </div>
+            </div>
+            <div style={{ background: 'var(--card-bg)' }} className="col-sm-12 col-md-6 col-lg-6 calorie-tracker rounded-5 p-4 mt-3">
+              <h2 className="text-light fs-1 mb-3">Stats</h2>
+              <div className="row justify-content-center g-3">
+
+                {/* Column 1 */}
+                <div className="col-12 col-md-4 col-lg-4">
+                  <div style={{ backgroundColor: "#332E2E" }} className="p-4 rounded-5 text-center h-100">
+                    <p className="fs-1 fw-bold mb-1" style={{ color: "var(--color-blue)" }}>175LBS</p>
+                    <span className="text-secondary d-block">Weight</span>
+                  </div>
+                </div>
+
+                {/* Column 2 */}
+                <div className="col-12 col-md-4 col-lg-4">
+                  <div style={{ backgroundColor: "#332E2E" }} className="p-4 rounded-5 text-center h-100">
+                    <p className="fs-1 fw-bold mb-1" style={{ color: "var(--color-blue)" }}>15 %</p>
+                    <span className="text-secondary d-block">Body Fat</span>
+                  </div>
+                </div>
+
+                {/* Column 3 */}
+                <div className="col-12 col-md-4 col-lg-4">
+                  <div style={{ backgroundColor: "#332E2E" }} className="p-4 rounded-5 text-center h-100">
+                    <p className="fs-1 fw-bold mb-1" style={{ color: "var(--color-blue)" }}>Sep 1</p>
+                    <span className="text-secondary d-block">Deadline</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
