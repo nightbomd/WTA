@@ -252,6 +252,7 @@ export default function CreateWorkout({ isLoadingWorkout, onSave }) {
   const [animating, setAnimating] = useState(false);
   const [workoutData, setWorkoutData] = useState({ name: "", type: "", muscles: [] });
   const [exercises, setExercises] = useState([]);
+  const [isWorkoutCreated, setIsWorkoutCreated] = useState(false);
 
   const canNext = () => {
     if (step === 0) return workoutData.name.trim().length > 0 && workoutData.type;
@@ -331,7 +332,7 @@ export default function CreateWorkout({ isLoadingWorkout, onSave }) {
             Next →
           </button>
         ) : (
-          <button onClick={handleSave} style={styles.saveBtn}>
+          <button onClick={() => { handleSave(); setIsWorkoutCreated(true); }} style={styles.saveBtn}>
             Save Workout ✓
           </button>
         )}

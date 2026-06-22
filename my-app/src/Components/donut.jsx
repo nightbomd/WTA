@@ -9,7 +9,7 @@ export default function DonutComponent({ value }) {
 
   const styles = {
     outerContainer: {
-      backgroundColor: '#231F1F', 
+      backgroundColor: 'var(--card-bg)',
       width: '400px',
       height: '400px',
     },
