@@ -1,7 +1,4 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
 import ProgressBar from './Components/progressBar'
 import './App.css'
 import DonutComponent from './Components/donut'
