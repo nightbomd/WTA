@@ -6,30 +6,35 @@ import ProgressBar from './Components/progressBar'
 import './App.css'
 import DonutComponent from './Components/donut'
 import Button from "./Components/btn"
+import CreateWorkout from './Components/createWorkout'
 
 function App() {
   const [workoutCreated, setWorkoutCreated] = useState(false);
+  const [isLoadingWorkout, setIsLoadingWorkout] = useState(false);
+
   return (
     <>
-      <body style={{ background: 'var(--bg-color)' }} className="p-5">
+      <div style={{ background: 'var(--bg-color)' }} className="p-5">
         <header className="row">
+          {! isLoadingWorkout && (
           <div className="col-sm-12 col-md-6">
             <h1 className="mb-5" style={{ fontSize: 'var(--font-size-header)' }}><span className="text-light mb-4">Welcome,</span> <br /><span style={{ color: 'var(--color-blue)' }}>Marcus!</span></h1>
-          </div>
+          </div>)}
           <div className="create-workout col-sm-12 col-md-6">
             {/* Conditionally render the entire block only if workoutCreated is false */}
             {!workoutCreated && (
               <>
                 <p className="fs-1 text-light">No workout Currently</p>
-                <Button text="Create a workout" onClick={() => setWorkoutCreated(true)} />
+                <Button text="Create a workout" onClick={() => { setWorkoutCreated(true); setIsLoadingWorkout(true); }} />
               </>
             )}
-          </div>  
+          </div>
         </header>
-        <main>
-          <div className="row g-5">
-            <div style={{ background: 'var(--card-bg)' }} className=" card-workout col-sm-12 col-md-6 col-lg-6 rounded-5 shadow p-4">
-              <p className="text-secondary">Today's workout:</p>
+        {!isLoadingWorkout && (
+          <main>
+            <div className="row g-5">
+              <div style={{ background: 'var(--card-bg)' }} className=" card-workout col-sm-12 col-md-6 col-lg-6 rounded-5 shadow p-4">
+                <p className="text-secondary">Today's workout:</p>
               <h2 className="text-light">Monday: <span className="p-2 rounded-5" style={{ background: "var(--span-red)", color: "var(--color-red)" }}>PUSH</span></h2>
               <ProgressBar text="5/6 exercises" value={30} bg="var(--color-blue)" />
               <div className="exercise-list text-light">
@@ -146,8 +151,18 @@ function App() {
             </div>
           </div>
         </main>
-      </body>
+        )}
+      
+      </div>
+       {isLoadingWorkout && (
+        
+         
+          <CreateWorkout className="w-100" isLoadingWorkout={isLoadingWorkout} onSave={(workout) => handleSave(workout)} />
+
+       
+       )}
     </>
+    
   )
 }
 
