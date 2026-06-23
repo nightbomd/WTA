@@ -491,7 +491,7 @@ const S = {
     borderRadius: 12, color: "#aaa", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
   },
   nextBtn: {
-    padding: "13px 28px", background: "linear-gradient(135deg, #3b82f6, #6366f1)",
+    padding: "13px 28px", background: "linear-gradient(135deg, #3b82f6, #3b82f6)",
     border: "none", borderRadius: 12, color: "#fff", fontSize: 15, fontWeight: 800,
     cursor: "pointer", letterSpacing: "-0.01em", fontFamily: "inherit", transition: "opacity 0.2s ease",
   },
