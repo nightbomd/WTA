@@ -49,7 +49,7 @@ const Chip = ({ label, selected, onClick }) => (
     border: selected ? "1.5px solid #3b82f6" : "1.5px solid #2a2a2a",
     background: selected ? "rgba(59,130,246,0.12)" : "#161616",
     color: selected ? "#3b82f6" : "#aaa",
-    fontSize: 13, fontWeight: selected ? 700 : 500,
+    fontSize: 16, fontWeight: selected ? 700 : 500,
     cursor: "pointer", transition: "all 0.15s ease",
     whiteSpace: "nowrap", flexShrink: 0,
   }}>
@@ -272,7 +272,7 @@ const StepReview = ({ data, exercises, isEditing }) => (
         {data.muscles.map(m => <span key={m} style={{ ...S.badge, background: "rgba(99,102,241,0.12)", color: "#818cf8", borderColor: "rgba(99,102,241,0.25)" }}>{m}</span>)}
       </div>
     </div>
-    <div style={{ fontSize: 11, color: "#666", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", paddingLeft: 4 }}>
+    <div style={{ fontSize: 15, color: "#666", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", paddingLeft: 4 }}>
       {exercises.length} Exercise{exercises.length !== 1 ? "s" : ""}
     </div>
     {exercises.map((ex) => (
@@ -360,7 +360,7 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
           {onCancel && (
             <button onClick={onCancel} style={{
               background: "none", border: "1px solid #2a2a2a", borderRadius: 8,
-              color: "#666", fontSize: 13, fontWeight: 700, padding: "6px 14px",
+              color: "#666", fontSize: 18, fontWeight: 700, padding: "6px 14px",
               cursor: "pointer", fontFamily: "inherit",
             }}>Cancel</button>
           )}
@@ -368,10 +368,10 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
         {/* Progress bar — swap mock for your real <ProgressBar /> */}
         <div style={{ width: "100%" }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-            <span style={{ fontSize: 11, color: "#888", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+            <span style={{ fontSize: 15, color: "#888", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" }}>
               {STEPS[step].label}
             </span>
-            <span style={{ fontSize: 11, color: isEditing ? "#f59e0b" : "#3b82f6", fontWeight: 700 }}>
+            <span style={{ fontSize: 15, color: isEditing ? "#f59e0b" : "#3b82f6", fontWeight: 700 }}>
               {STEPS[step].progress}%
             </span>
           </div>
