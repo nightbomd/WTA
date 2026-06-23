@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
- 
+
 // --- Constants ---
 const WORKOUT_TYPES = ["Push", "Pull", "Legs", "Upper", "Lower", "Full Body", "Cardio", "Custom"];
 const MUSCLE_TAGS = ["Chest", "Back", "Shoulders", "Biceps", "Triceps", "Quads", "Hamstrings", "Glutes", "Core", "Calves"];
@@ -9,7 +9,39 @@ const STEPS = [
   { label: "Exercises",   progress: 66 },
   { label: "Review",      progress: 100 },
 ];
- 
+
+// --- Exercise Search Data ---
+const searchQuery = [
+  { muscle: "Chest",      keywords: ["Bench Press", "Push-Up", "Chest Fly", "Cable Crossover", "Incline DB Press", "Machine Press", "Smith Machine Press", "Decline Press", "Pec Deck"] },
+  { muscle: "Back",       keywords: ["Pull-Up", "Barbell Row", "Lat Pulldown", "Seated Cable Row", "T-Bar Row", "Single Arm DB Row", "Face Pull", "Deadlift"] },
+  { muscle: "Shoulders",  keywords: ["Overhead Press", "Lateral Raise", "Front Raise", "Arnold Press", "Upright Row", "Cable Lateral Raise", "Rear Delt Fly", "DB Shoulder Press"] },
+  { muscle: "Biceps",     keywords: ["Barbell Curl", "DB Curl", "Hammer Curl", "Preacher Curl", "Cable Curl", "Concentration Curl", "Incline DB Curl", "Spider Curl"] },
+  { muscle: "Triceps",    keywords: ["Tricep Dip", "Skull Crusher", "Overhead Tricep Extension", "Cable Pushdown", "Close Grip Bench", "Diamond Push-Up", "Kickback"] },
+  { muscle: "Quads",      keywords: ["Squat", "Leg Press", "Hack Squat", "Leg Extension", "Bulgarian Split Squat", "Lunge", "Front Squat", "Goblet Squat"] },
+  { muscle: "Hamstrings", keywords: ["Romanian Deadlift", "Leg Curl", "Nordic Curl", "Good Morning", "Stiff Leg Deadlift", "Glute Ham Raise", "Sumo Deadlift"] },
+  { muscle: "Glutes",     keywords: ["Hip Thrust", "Glute Bridge", "Cable Kickback", "Step Up", "Sumo Squat", "Donkey Kick", "Abductor Machine"] },
+  { muscle: "Core",       keywords: ["Plank", "Crunch", "Cable Crunch", "Hanging Leg Raise", "Ab Wheel", "Russian Twist", "Decline Sit-Up", "Pallof Press"] },
+  { muscle: "Calves",     keywords: ["Standing Calf Raise", "Seated Calf Raise", "Leg Press Calf Raise", "Single Leg Calf Raise", "Donkey Calf Raise"] },
+];
+
+// Flatten into {name, muscle} for quick lookup
+const ALL_EXERCISES = searchQuery.flatMap(({ muscle, keywords }) =>
+  keywords.map(name => ({ name, muscle }))
+);
+
+const MUSCLE_BADGE_COLORS = {
+  Chest:      { bg: "rgba(239,68,68,.12)",    color: "#ef4444" },
+  Back:       { bg: "rgba(59,130,246,.12)",   color: "#3b82f6" },
+  Shoulders:  { bg: "rgba(249,115,22,.12)",   color: "#f97316" },
+  Biceps:     { bg: "rgba(168,85,247,.12)",   color: "#a855f7" },
+  Triceps:    { bg: "rgba(236,72,153,.12)",   color: "#ec4899" },
+  Quads:      { bg: "rgba(234,179,8,.12)",    color: "#eab308" },
+  Hamstrings: { bg: "rgba(34,197,94,.12)",    color: "#22c55e" },
+  Glutes:     { bg: "rgba(20,184,166,.12)",   color: "#14b8a6" },
+  Core:       { bg: "rgba(148,163,184,.12)",  color: "#94a3b8" },
+  Calves:     { bg: "rgba(251,191,36,.12)",   color: "#fbbf24" },
+};
+
 // --- Chip ---
 const Chip = ({ label, selected, onClick }) => (
   <button onClick={onClick} style={{
@@ -24,7 +56,7 @@ const Chip = ({ label, selected, onClick }) => (
     {label}
   </button>
 );
- 
+
 // --- Step 1: Name & Type ---
 const StepNameType = ({ data, onChange }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
@@ -62,7 +94,7 @@ const StepNameType = ({ data, onChange }) => (
     </div>
   </div>
 );
- 
+
 // --- Exercise Card ---
 const ExerciseCard = ({ exercise, onUpdate, onRemove }) => {
   const [open, setOpen] = useState(true);
@@ -111,16 +143,47 @@ const ExerciseCard = ({ exercise, onUpdate, onRemove }) => {
     </div>
   );
 };
- 
+
 // --- Step 2: Exercises ---
 const StepExercises = ({ exercises, onUpdate }) => {
   const [query, setQuery] = useState("");
   const [showAdd, setShowAdd] = useState(false);
-  const addExercise = () => {
-    if (!query.trim()) return;
-    onUpdate([...exercises, { id: Date.now(), name: query.trim(), sets: "", reps: "", weight: "", notes: "" }]);
-    setQuery(""); setShowAdd(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [highlightIdx, setHighlightIdx] = useState(-1);
+
+  const getSuggestions = (val) => {
+    if (!val.trim()) return [];
+    const q = val.toLowerCase();
+    return ALL_EXERCISES.filter(ex => ex.name.toLowerCase().includes(q)).slice(0, 6);
   };
+
+  const handleQueryChange = (val) => {
+    setQuery(val);
+    setHighlightIdx(-1);
+    setSuggestions(getSuggestions(val));
+  };
+
+  const commitExercise = (name) => {
+    if (!name.trim()) return;
+    onUpdate([...exercises, { id: Date.now(), name: name.trim(), sets: "", reps: "", weight: "", notes: "" }]);
+    setQuery(""); setSuggestions([]); setShowAdd(false); setHighlightIdx(-1);
+  };
+
+  const handleKeyDown = (e) => {
+    if (suggestions.length === 0) {
+      if (e.key === "Enter") commitExercise(query);
+      return;
+    }
+    if (e.key === "ArrowDown") { e.preventDefault(); setHighlightIdx(i => Math.min(i + 1, suggestions.length - 1)); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); setHighlightIdx(i => Math.max(i - 1, -1)); }
+    else if (e.key === "Enter") {
+      e.preventDefault();
+      highlightIdx >= 0 ? commitExercise(suggestions[highlightIdx].name) : commitExercise(query);
+    } else if (e.key === "Escape") {
+      setSuggestions([]); setHighlightIdx(-1);
+    }
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       {exercises.length === 0 && !showAdd && (
@@ -137,14 +200,57 @@ const StepExercises = ({ exercises, onUpdate }) => {
         />
       ))}
       {showAdd ? (
-        <div style={{ display: "flex", gap: 8 }}>
-          <input type="text" placeholder="Exercise name..."
-            value={query} onChange={e => setQuery(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && addExercise()}
-            autoFocus style={{ ...S.input, flex: 1 }}
-          />
-          <button onClick={addExercise} style={S.primaryBtn}>Add</button>
-          <button onClick={() => setShowAdd(false)} style={S.ghostBtn}>✕</button>
+        <div style={{ position: "relative" }}>
+          <div style={{ display: "flex", gap: 8 }}>
+            <input
+              type="text" placeholder="Search exercises..."
+              value={query}
+              onChange={e => handleQueryChange(e.target.value)}
+              onKeyDown={handleKeyDown}
+              autoFocus
+              style={{ ...S.input, flex: 1 }}
+            />
+            <button onClick={() => commitExercise(query)} style={S.primaryBtn}>Add</button>
+            <button onClick={() => { setShowAdd(false); setQuery(""); setSuggestions([]); }} style={S.ghostBtn}>✕</button>
+          </div>
+          {suggestions.length > 0 && (
+            <div style={{
+              position: "absolute", top: "calc(100% + 6px)", left: 0,
+              right: 0, background: "#1a1a1a",
+              border: "1.5px solid #2a2a2a", borderRadius: 12,
+              overflow: "hidden", zIndex: 50,
+              boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+            }}>
+              {suggestions.map((ex, i) => {
+                const badge = MUSCLE_BADGE_COLORS[ex.muscle] || { bg: "#222", color: "#888" };
+                const isHighlighted = i === highlightIdx;
+                return (
+                  <div
+                    key={ex.name}
+                    onMouseDown={() => commitExercise(ex.name)}
+                    onMouseEnter={() => setHighlightIdx(i)}
+                    style={{
+                      display: "flex", alignItems: "center", justifyContent: "space-between",
+                      padding: "11px 14px",
+                      background: isHighlighted ? "#242424" : "transparent",
+                      borderBottom: i < suggestions.length - 1 ? "1px solid #222" : "none",
+                      cursor: "pointer", transition: "background 0.1s ease",
+                    }}
+                  >
+                    <span style={{ color: "#f0f0f0", fontSize: 14, fontWeight: isHighlighted ? 600 : 400 }}>
+                      {ex.name}
+                    </span>
+                    <span style={{
+                      fontSize: 11, fontWeight: 700, padding: "3px 9px", borderRadius: 99,
+                      background: badge.bg, color: badge.color, flexShrink: 0, marginLeft: 10,
+                    }}>
+                      {ex.muscle}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       ) : (
         <button onClick={() => setShowAdd(true)} style={S.addExerciseBtn}>+ Add Exercise</button>
@@ -152,7 +258,7 @@ const StepExercises = ({ exercises, onUpdate }) => {
     </div>
   );
 };
- 
+
 // --- Step 3: Review ---
 const StepReview = ({ data, exercises, isEditing }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -187,17 +293,17 @@ const StepReview = ({ data, exercises, isEditing }) => (
     )}
   </div>
 );
- 
+
 // --- Main ---
 export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, onCancel }) {
   const isEditing = !!initialData;
- 
+
   const [step, setStep]           = useState(0);
   const [direction, setDirection] = useState(1);
   const [animating, setAnimating] = useState(false);
   const [workoutData, setWorkoutData] = useState({ name: "", type: "", muscles: [] });
   const [exercises, setExercises] = useState([]);
- 
+
   // Load initialData (edit mode) OR draft (new mode)
   useEffect(() => {
     if (isEditing) {
@@ -212,34 +318,34 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
       }
     }
   }, []);
- 
+
   // Auto-save draft only in create mode
   useEffect(() => {
     if (!isEditing) {
       localStorage.setItem('workoutDraft', JSON.stringify({ workoutData, exercises }));
     }
   }, [workoutData, exercises]);
- 
+
   const canNext = () => {
     if (step === 0) return workoutData.name.trim().length > 0 && workoutData.type;
     if (step === 1) return exercises.length > 0;
     return true;
   };
- 
+
   const navigate = (dir) => {
     if (animating) return;
     setDirection(dir);
     setAnimating(true);
     setTimeout(() => { setStep(s => s + dir); setAnimating(false); }, 220);
   };
- 
+
   const handleSave = () => {
     onSave?.({ ...workoutData, exercises });
     localStorage.removeItem('workoutDraft');
   };
- 
+
   if (!isLoadingWorkout) return null;
- 
+
   return (
     <div style={S.root}>
       {/* Header */}
@@ -293,7 +399,7 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
           ))}
         </div>
       </div>
- 
+
       {/* Step Content */}
       <div style={{
         flex: 1, overflowY: "auto", padding: "20px 20px 0",
@@ -305,7 +411,7 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
         {step === 1 && <StepExercises exercises={exercises} onUpdate={setExercises} />}
         {step === 2 && <StepReview data={workoutData} exercises={exercises} isEditing={isEditing} />}
       </div>
- 
+
       {/* Bottom Nav */}
       <div style={S.bottomNav}>
         {step > 0
@@ -331,7 +437,7 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
     </div>
   );
 }
- 
+
 // --- Styles ---
 const S = {
   root: {
