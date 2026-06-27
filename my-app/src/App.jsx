@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import ProgressBar from './Components/progressBar'
 import './App.css'
 import DonutComponent from './Components/donut'
@@ -126,26 +126,40 @@ function App() {
   const [isLoadingWorkout, setIsLoadingWorkout] = useState(false);
   const [editingWorkout, setEditingWorkout]     = useState(null); // workout being edited
   const [selectedDate, setSelectedDate]         = useState(today);
+  const isMounted = useRef(false); // skip saving on initial render
 
   // Load from localStorage on mount
   useEffect(() => {
-    const stored = localStorage.getItem('workoutLog');
-    if (stored) setWorkoutLog(JSON.parse(stored));
+    try {
+      const stored = localStorage.getItem('workoutLog');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          setWorkoutLog(parsed);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load workout log:", error);
+    }
+    isMounted.current = true;
   }, []);
 
-  // Persist any time workoutLog changes
+  // Persist workoutLog — but skip the initial render so we don't overwrite before loading
   useEffect(() => {
-    localStorage.setItem('workoutLog', JSON.stringify(workoutLog));
+    if (!isMounted.current) return;
+    try {
+      localStorage.setItem('workoutLog', JSON.stringify(workoutLog));
+    } catch (error) {
+      console.error("Failed to save workout log:", error);
+    }
   }, [workoutLog]);
 
   const handleSave = (workout) => {
     if (editingWorkout) {
-      // Update existing entry, keep its original date
       setWorkoutLog(prev =>
         prev.map(w => w.id === editingWorkout.id ? { ...workout, id: w.id, date: w.date } : w)
       );
     } else {
-      // New workout — stamp with today's local date
       const newWorkout = { ...workout, id: Date.now(), date: today };
       setWorkoutLog(prev => [...prev, newWorkout]);
     }
