@@ -4,6 +4,7 @@ import './App.css'
 import DonutComponent from './Components/donut'
 import Button from "./Components/btn"
 import CreateWorkout from './Components/createWorkout'
+//import { weekdays } from '../consts/weekdays'
 
 // --- Helpers ---
 // Returns YYYY-MM-DD in LOCAL time (not UTC)
@@ -290,6 +291,11 @@ function App() {
                         style={{ fontSize: 13, ...typeStyle(displayWorkout.type) }}>
                         {displayWorkout.type}
                       </span>
+                      {displayWorkout.day && (
+                        <span style={{ background: "rgba(241, 187, 99, 0.12)", color: "#f8bd81ff", border: "1px solid rgba(241, 187, 99, 0.25)", borderRadius: '99px', fontSize: 13, padding: '4px 12px', fontWeight: 600 }}>
+                          {/* {weekdays[displayWorkout.day]?.label || "No Date"} */}
+                        </span>
+                      )}
                     </h2>
                     {displayWorkout.muscles?.length > 0 && (
                       <div className="d-flex flex-wrap gap-2 mb-3">

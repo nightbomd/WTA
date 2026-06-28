@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Select from './select'
 
 // --- Constants ---
 const WORKOUT_TYPES = ["Push", "Pull", "Legs", "Upper", "Lower", "Full Body", "Cardio", "Custom"];
@@ -42,6 +43,17 @@ const MUSCLE_BADGE_COLORS = {
   Calves:     { bg: "rgba(251,191,36,.12)",   color: "#fbbf24" },
 };
 
+ const weekDays = {
+  monday: { label: "Monday", value: "monday" },
+  tuesday: { label: "Tuesday", value: "tuesday" },
+  wednesday: { label: "Wednesday", value: "wednesday" },
+  thursday: { label: "Thursday", value: "thursday" },
+  friday: { label: "Friday", value: "friday" },
+  saturday: { label: "Saturday", value: "saturday" },
+  sunday: { label: "Sunday", value: "sunday" },
+};
+
+
 // --- Chip ---
 const Chip = ({ label, selected, onClick }) => (
   <button onClick={onClick} style={{
@@ -58,9 +70,29 @@ const Chip = ({ label, selected, onClick }) => (
 );
 
 // --- Step 1: Name & Type ---
-const StepNameType = ({ data, onChange }) => (
-  <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-    <div>
+const StepNameType = ({ data, onChange }) => {
+  const [selectedDay, setSelectedDay] = useState("");
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+      <div style={{ width: "100%" }}>
+        <Select
+          options={[
+            { value: "", label: "Day" },
+          { value: "monday", label: "Monday " },
+          { value: "tuesday", label: "Tuesday " },
+          { value: "wednesday", label: "Wednesday " },
+          { value: "thursday", label: "Thursday " },
+          { value: "friday", label: "Friday " },
+          { value: "saturday", label: "Saturday " },
+          { value: "sunday", label: "Sunday " },
+        ]}
+        value={data.day}
+        onChange={value => {
+          setSelectedDay(value);
+          onChange({ ...data, day: value });
+        }}
+        style={{ ...S.select }}
+      />
       <label style={S.label}>Workout Name</label>
       <input
         type="text" placeholder="e.g. Monday Push Day"
@@ -93,7 +125,7 @@ const StepNameType = ({ data, onChange }) => (
       </div>
     </div>
   </div>
-);
+);}
 
 // --- Exercise Card ---
 const ExerciseCard = ({ exercise, onUpdate, onRemove }) => {
@@ -266,10 +298,12 @@ const StepReview = ({ data, exercises, isEditing }) => (
       <div style={{ fontSize: 11, color: isEditing ? "#f59e0b" : "#3b82f6", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>
         {isEditing ? "Editing Workout" : "Overview"}
       </div>
+      {/* overview of workout */}
       <div style={{ fontSize: 22, fontWeight: 800, color: "#fff", marginBottom: 4 }}>{data.name || "Untitled Workout"}</div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
         {data.type && <span style={S.badge}>{data.type}</span>}
         {data.muscles.map(m => <span key={m} style={{ ...S.badge, background: "rgba(99,102,241,0.12)", color: "#818cf8", borderColor: "rgba(99,102,241,0.25)" }}>{m}</span>)}
+        <span style={{ ...S.badge, background: "rgba(241, 187, 99, 0.12)", color: "#f8bd81ff", borderColor: "rgba(99,102,241,0.25)" }}>{weekDays[data.day]?.label || "No Date"}</span>
       </div>
     </div>
     <div style={{ fontSize: 11, color: "#666", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", paddingLeft: 4 }}>
@@ -304,6 +338,7 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
   const [workoutData, setWorkoutData] = useState({ name: "", type: "", muscles: [] });
   const [exercises, setExercises] = useState([]);
   const [draftLoaded, setDraftLoaded] = useState(false); // flag to prevent save before draft loads
+
 
   // Load initialData (edit mode) OR draft (new mode)
   useEffect(() => {
@@ -514,4 +549,5 @@ const S = {
     flex: 1, padding: "15px 28px", border: "none", borderRadius: 12,
     color: "#fff", fontSize: 15, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", letterSpacing: "-0.01em",
   },
+ 
 };
