@@ -4,6 +4,7 @@ import './App.css'
 import DonutComponent from './Components/donut'
 import Button from "./Components/btn"
 import CreateWorkout from './Components/createWorkout'
+import Inquiry from './Components/inquiry'
 //import { weekdays } from '../consts/weekdays'
 
 // --- Helpers ---
@@ -128,6 +129,19 @@ function App() {
   const [editingWorkout, setEditingWorkout]     = useState(null); // workout being edited
   const [selectedDate, setSelectedDate]         = useState(today);
   const isMounted = useRef(false); // skip saving on initial render
+  const [isRegistered, setIsRegistering] = useState(false);
+
+
+  useEffect(() => {
+    const inquiryData = localStorage.getItem('inquiryData');
+    if (inquiryData) {
+      setIsRegistering(true);
+      const parsed = JSON.parse(inquiryData);
+     if (Array.isArray(parsed)) {
+       // Do something with the parsed inquiry data
+     }
+    }
+  }, []);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -490,6 +504,9 @@ function App() {
           onSave={handleSave}
           onCancel={handleCancel}
         />
+      )}
+      {!isRegistered && (
+        <Inquiry />
       )}
     </>
   );

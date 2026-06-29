@@ -47,3 +47,8 @@
   background: #0a0a0a;
   color: white;
 }
+body {
+  background: var(--bg-color);
+  color: white;
+  font-family: Arial, sans-serif;
+}
