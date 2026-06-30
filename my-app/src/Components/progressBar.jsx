@@ -1,9 +1,9 @@
-function ProgressBar({ text, value, bg}) {
+function ProgressBar({ text, value, bg }) {
   return (
     <div className="progress-container my-3">
       <div className="progress-header">
         <span>{text}</span>
-        <span>{value}%</span>
+        <span>{Math.floor(value)}%</span>
       </div>
 
       <div className="progress-box">

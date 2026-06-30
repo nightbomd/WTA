@@ -1,7 +1,199 @@
+import ProgressBar from "./progressBar";
+import { useState } from "react"
+import Button from "./btn";
+
+const formQuestion = [
+  {
+    step: 0,
+    question: "What shall we call you?",
+    type: "text",
+  },
+  {
+    step: 1,
+    question: "Age Range?",
+    type: "select",
+    options: [
+      { value: "", label: "Select an age range" },
+      { value: "<18", label: "<18" },
+      { value: "18-24", label: "18-24" },
+      { value: "25-34", label: "25-34" },
+      { value: "35-44", label: "35-44" },
+      { value: "45-54", label: "45-54" },
+      { value: "55+", label: "55+" },
+    ],
+  },
+  {
+    step: 2,
+    question: "Height and Weight",
+    unit: "cm",
+  },
+  {
+    step: 3,
+    question: "What's your primary fitness goal?",
+    type: "select",
+    options: [
+      { value: "", label: "Choose one" },
+      { value: "build-muscle", label: "Build Muscle" },
+      { value: "lose-fat", label: "Lose Fat" },
+      { value: "gain-strength", label: "Gain Strength" },
+      { value: "improve-endurance", label: "Improve Endurance" },
+      { value: "general-health", label: "General Health" },
+    ],
+  },
+  {
+    step: 4,
+    question: "How would you describe your experience/level?",
+    type: "select",
+    options: [
+      { value: "", label: "Choose one" },
+      { value: "beginner", label: "Beginner" },
+      { value: "intermediate", label: "Intermediate" },
+      { value: "advanced", label: "Advanced" },
+    ],
+  },
+  {
+    step: 5,
+    question: "How many days per week do you usually work out?",
+    type: "select",
+    options: [
+      { value: "", label: "Choose one" },
+      { value: "1", label: "1 Day" },
+      { value: "2", label: "2 Days" },
+      { value: "3", label: "3 Days" },
+      { value: "4", label: "4 Days" },
+      { value: "5", label: "5 Days" },
+      { value: "6", label: "6 Days" },
+      { value: "7", label: "7 Days" },
+    ],
+  },
+  {
+    step: 6,
+    question: "Where do you usually train?",
+    type: "select",
+    options: [
+      { value: "", label: "Choose one" },
+      { value: "gym", label: "Commercial Gym" },
+      { value: "home", label: "Home Gym" },
+      { value: "both", label: "Both" },
+      { value: "outdoors", label: "Outdoors" },
+    ],
+  },
+  {
+    step: 7,
+    question: "What equipment do you have access to?",
+    type: "multiselect",
+    options: [
+      "Barbell",
+      "Dumbbells",
+      "Machines",
+      "Cable Machine",
+      "Pull-up Bar",
+      "Resistance Bands",
+      "Kettlebells",
+      "Bodyweight Only",
+    ],
+  },
+  {
+    step: 8,
+    question: "What muscle groups do you prioritize?",
+    type: "multiselect",
+    options: [
+      "Chest",
+      "Back",
+      "Shoulders",
+      "Arms",
+      "Legs",
+      "Core",
+      "Full Body",
+    ],
+  },
+  {
+    step: 9,
+    question: "Any injuries or limitations?",
+    type: "textarea",
+  },
+];
 export default function Inquiry() {
+    const [step, setStep] = useState(0);
+
     return (
-        <div>
-            <h1>Inquiry</h1>
-        </div>
+        <main className="container p-5 col-sm-8 col-md-5 col-lg-5 text-center ">
+            <h1>Lets Get you  <span style={{ color: "#3592f5ff" }}>Started</span>.</h1>
+            <div className="logo text-center">
+                <img src="..." alt="Logo"></img>
+            </div>
+            <ProgressBar bg="#007bff" value={(step / formQuestion.length) * 100} />
+            <div className="question-container py-5">
+
+                <h2 className="mb-5">{formQuestion[step].question}</h2>
+                {step === 0 && <input type="text" className="form-control" />}
+                {step === 1 && (
+                    <select className="form-select">
+                        {formQuestion[step].options.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+                )}
+                {step === 2 && (
+                    <div className="d-flex flex-column gap-3" >
+                        <input type="text" className="form-control" placeholder="Height (cm)" />
+                        <input type="text" className="form-control" placeholder="Weight (kg)" />
+                    </div>
+                )}
+                {step === 3 && (
+                    <select className = "form-select">
+                        {formQuestion[step].options.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+                )}
+                 {step === 4 && (
+                    <select className = "form-select">
+                        {formQuestion[step].options.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+                )}
+                  {step === 5 && (
+                    <select className = "form-select">
+                        {formQuestion[step].options.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+                )}
+                   {step === 6  && (
+                    <select className = "form-select">
+                        {formQuestion[step].options.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+                )}
+                
+            </div>
+            <div className = "d-flex gap-5">
+                <Button onClick={() => setStep(step - 1)}
+                    style={{ width: "100% !important" }}
+                    text={"Back"}
+                    bg = "#282f36ff"
+                    isDisabled = {step === 0}
+                ></Button>
+                <Button onClick={() => setStep(step + 1)}
+                style={{ width: "100% !important" }}
+                text={"Next"}
+            >
+            </Button>
+            </div>
+
+        </main>
     );
 }

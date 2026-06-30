@@ -204,7 +204,9 @@ function App() {
   const displayWorkout = workoutsOnDate[0] || null;
 
   const isToday = selectedDate === today;
-
+  if (!isRegistered) {
+    return <Inquiry />;
+  }
   return (
     <>
       <div style={{ background: 'var(--bg-color)' }} className="container-fluid">
@@ -505,9 +507,7 @@ function App() {
           onCancel={handleCancel}
         />
       )}
-      {!isRegistered && (
-        <Inquiry />
-      )}
+    
     </>
   );
 }

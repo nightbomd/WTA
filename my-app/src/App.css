@@ -52,3 +52,25 @@ body {
   color: white;
   font-family: Arial, sans-serif;
 }
+.form-control {
+  background: var(--card-bg) !important;
+  color: white !important;
+  border: 1px solid #333;
+}
+.form-control::placeholder {
+  color: white !important
+}
+.form-control:focus {
+  border: 1px solid black;
+  outline: none;
+}
+.form-select {
+  background: var(--card-bg) !important;
+  font-size: 1rem;
+  padding: 8px 12px;
+  border-bottom: 1px solid #333;
+  color: white !important;
+}
+option {
+  color: white !important;
+}
