@@ -130,8 +130,13 @@ function App() {
   const [selectedDate, setSelectedDate]         = useState(today);
   const isMounted = useRef(false); // skip saving on initial render
   const [isRegistered, setIsRegistering] = useState(false);
+  const [inquiryData, setInquiryData] = useState(() => {
+    const saved = localStorage.getItem('inquiryData');
+    return saved ? JSON.parse(saved) : {};
+  });
 
-
+  
+   
   useEffect(() => {
     const inquiryData = localStorage.getItem('inquiryData');
     if (inquiryData) {
@@ -141,7 +146,7 @@ function App() {
        // Do something with the parsed inquiry data
      }
     }
-  }, []);
+  }, []); 
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -198,14 +203,17 @@ function App() {
     localStorage.removeItem('workoutDraft');
   };
 
+  
+
   // Workouts for the selected date
   const workoutsOnDate = workoutLog.filter(w => w.date === selectedDate);
   // Primary displayed workout (first one on that date, could extend to multiple later)
   const displayWorkout = workoutsOnDate[0] || null;
 
   const isToday = selectedDate === today;
+
   if (!isRegistered) {
-    return <Inquiry />;
+    return <Inquiry setIsRegistering={setIsRegistering} />;
   }
   return (
     <>
@@ -218,7 +226,7 @@ function App() {
               <div className="col-sm-12 col-md-6">
                 <h1 className="mb-0" style={{ fontSize: 'var(--font-size-header)' }}>
                   <span className="text-light">Welcome,</span><br />
-                  <span style={{ color: 'var(--color-blue)' }}>Marcus!</span>
+                  <span style={{ color: 'var(--color-blue)' }}>{inquiryData.name}</span>
                 </h1>
               </div>
             )}
@@ -418,7 +426,7 @@ function App() {
                 <div className="row justify-content-center g-3">
                   <div className="col-12 col-md-4">
                     <div style={{ backgroundColor: '#332E2E' }} className="p-4 rounded-5 text-center h-100">
-                      <p className="fs-1 fw-bold mb-1" style={{ color: 'var(--color-blue)' }}>175LBS</p>
+                      <p className="fs-1 fw-bold mb-1" style={{ color: 'var(--color-blue)' }}>{ inquiryData.weight || '—'}kg</p>
                       <span className="text-secondary d-block">Weight</span>
                     </div>
                   </div>

@@ -114,10 +114,11 @@ const formQuestion = [
   },
 ];
 
-export default function Inquiry() {
+export default function Inquiry( {setIsRegistering }) {
     const [step, setStep] = useState(0);
     const [formData, setFormData] = useState({});
-
+    
+   
     const getFieldKey = () => {
       switch(step) {
         case 0: return "name";
@@ -153,12 +154,18 @@ export default function Inquiry() {
         : [...current, option];
       handleChange(key, updated);
     };
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      console.log("Form submitted:", formData);
+      setIsRegistering(true);
+      localStorage.setItem('inquiryData', JSON.stringify(formData));
+    }
 
     return (
         <main className="container p-5 col-sm-8 col-md-5 col-lg-5 text-center ">
             <h1>Lets Get you  <span style={{ color: "#3592f5ff" }}>Started</span>.</h1>
             <div className="logo text-center">
-                <img src="..." alt="Logo"></img>
+                <img style={{ width: '100px', height: '100px', margin: '0 auto' }} src="./public/download.png" alt="Logo"></img>
             </div>
             <ProgressBar bg="#007bff" value={(step / formQuestion.length) * 100} />
             <div className="question-container py-5">
@@ -315,7 +322,7 @@ export default function Inquiry() {
                   isDisabled={step === 0}
                 />
                 <Button 
-                  onClick={() => setStep(step + 1)}
+                  onClick={step === formQuestion.length - 1 ? handleSubmit : () => setStep(step + 1)}
                   style={{ width: "100% !important" }}
                   text={step === formQuestion.length - 1 ? "Submit" : "Next"}
                  
