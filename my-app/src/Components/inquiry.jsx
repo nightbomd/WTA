@@ -118,7 +118,8 @@ export default function Inquiry( {setIsRegistering }) {
     const [step, setStep] = useState(0);
     const [formData, setFormData] = useState({});
     
-   
+    
+     
     const getFieldKey = () => {
       switch(step) {
         case 0: return "name";
@@ -162,6 +163,8 @@ export default function Inquiry( {setIsRegistering }) {
     }
 
     return (
+    <>
+   
         <main className="container p-5 col-sm-8 col-md-5 col-lg-5 text-center ">
             <h1>Lets Get you  <span style={{ color: "#3592f5ff" }}>Started</span>.</h1>
             <div className="logo text-center">
@@ -330,5 +333,6 @@ export default function Inquiry( {setIsRegistering }) {
             </div>
 
         </main>
+        </>
     );
 }

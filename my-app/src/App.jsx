@@ -25,14 +25,14 @@ const formatDisplayDate = (dateStr) => {
 };
 
 const TYPE_COLORS = {
-  Push:      { bg: 'var(--span-red)',    color: 'var(--color-red)' },
-  Pull:      { bg: 'rgba(59,130,246,.15)', color: 'var(--color-blue)' },
-  Legs:      { bg: 'rgba(168,85,247,.15)', color: '#a855f7' },
-  Upper:     { bg: 'rgba(234,179,8,.15)',  color: 'var(--color-yellow)' },
-  Lower:     { bg: 'rgba(34,197,94,.15)',  color: 'var(--color-green)' },
+  Push: { bg: 'var(--span-red)', color: 'var(--color-red)' },
+  Pull: { bg: 'rgba(59,130,246,.15)', color: 'var(--color-blue)' },
+  Legs: { bg: 'rgba(168,85,247,.15)', color: '#a855f7' },
+  Upper: { bg: 'rgba(234,179,8,.15)', color: 'var(--color-yellow)' },
+  Lower: { bg: 'rgba(34,197,94,.15)', color: 'var(--color-green)' },
   'Full Body': { bg: 'rgba(249,115,22,.15)', color: '#f97316' },
-  Cardio:    { bg: 'rgba(236,72,153,.15)', color: '#ec4899' },
-  Custom:    { bg: 'rgba(148,163,184,.15)', color: '#94a3b8' },
+  Cardio: { bg: 'rgba(236,72,153,.15)', color: '#ec4899' },
+  Custom: { bg: 'rgba(148,163,184,.15)', color: '#94a3b8' },
 };
 
 const typeStyle = (type) =>
@@ -106,6 +106,15 @@ const WorkoutHistoryCard = ({ workout, onEdit, onDelete }) => {
   );
 };
 
+function MainLoad({fade}) {
+  return <>
+    <div className={`loader ${fade ? 'fade-out' : ''}`} style={{ background: "black", display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <img src="./public/app-logo.png" alt="Logo"></img>
+    </div>
+
+  </>;
+}
+
 const histStyles = {
   editBtn: {
     padding: '8px 18px', background: 'rgba(59,130,246,.12)',
@@ -124,29 +133,42 @@ const histStyles = {
 function App() {
   const today = toLocalDateStr(new Date());
 
-  const [workoutLog, setWorkoutLog]       = useState([]);       // all saved workouts
+  const [workoutLog, setWorkoutLog] = useState([]);       // all saved workouts
   const [isLoadingWorkout, setIsLoadingWorkout] = useState(false);
-  const [editingWorkout, setEditingWorkout]     = useState(null); // workout being edited
-  const [selectedDate, setSelectedDate]         = useState(today);
+  const [editingWorkout, setEditingWorkout] = useState(null); // workout being edited
+  const [selectedDate, setSelectedDate] = useState(today);
   const isMounted = useRef(false); // skip saving on initial render
   const [isRegistered, setIsRegistering] = useState(false);
   const [inquiryData, setInquiryData] = useState(() => {
     const saved = localStorage.getItem('inquiryData');
     return saved ? JSON.parse(saved) : {};
   });
+  const [loading, setLoading] = useState(true);
+  const [fade, setFade] = useState(false);
 
-  
-   
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFade(true);
+
+      setTimeout(() => {
+        setLoading(false);
+      }, 500); // fade duration
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+
   useEffect(() => {
     const inquiryData = localStorage.getItem('inquiryData');
     if (inquiryData) {
       setIsRegistering(true);
       const parsed = JSON.parse(inquiryData);
-     if (Array.isArray(parsed)) {
-       // Do something with the parsed inquiry data
-     }
+      if (Array.isArray(parsed)) {
+        // Do something with the parsed inquiry data
+      }
     }
-  }, []); 
+  }, []);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -203,7 +225,7 @@ function App() {
     localStorage.removeItem('workoutDraft');
   };
 
-  
+
 
   // Workouts for the selected date
   const workoutsOnDate = workoutLog.filter(w => w.date === selectedDate);
@@ -217,6 +239,7 @@ function App() {
   }
   return (
     <>
+      {loading && <MainLoad fade={fade} />}
       <div style={{ background: 'var(--bg-color)' }} className="container-fluid">
 
         {/* ── Header ── */}
@@ -347,8 +370,8 @@ function App() {
                               <span style={{ fontSize: '1.1rem', fontWeight: 600 }}>{exercise.name}</span>
                               <span className="text-secondary" style={{ fontSize: 13 }}>
                                 {[exercise.sets && `${exercise.sets} sets`,
-                                  exercise.reps && `${exercise.reps} reps`,
-                                  exercise.weight && `@ ${exercise.weight} lbs`
+                                exercise.reps && `${exercise.reps} reps`,
+                                exercise.weight && `@ ${exercise.weight} lbs`
                                 ].filter(Boolean).join(' · ')}
                               </span>
                             </div>
@@ -371,7 +394,7 @@ function App() {
 
               {/* Weekly Volume Card */}
               <div style={{ background: 'var(--card-bg)' }} className="card-workout col-sm-12 col-md-6 col-lg-6 rounded-5 shadow p-4">
-                <h2 className="text-light mb-3">Weekly Volume</h2>
+                <h2 className="text-light mb-3">Weekly Volume ({inquiryData.workoutDaysPerWeek} days)</h2>
                 {displayWorkout?.exercises?.length > 0 ? (
                   <div className="exercise-table">
                     <table className="table table-dark table-borderless mb-0" style={{ background: 'transparent' }}>
@@ -426,7 +449,7 @@ function App() {
                 <div className="row justify-content-center g-3">
                   <div className="col-12 col-md-4">
                     <div style={{ backgroundColor: '#332E2E' }} className="p-4 rounded-5 text-center h-100">
-                      <p className="fs-1 fw-bold mb-1" style={{ color: 'var(--color-blue)' }}>{ inquiryData.weight || '—'}kg</p>
+                      <p className="fs-1 fw-bold mb-1" style={{ color: 'var(--color-blue)' }}>{inquiryData.weight || '—'}kg</p>
                       <span className="text-secondary d-block">Weight</span>
                     </div>
                   </div>
@@ -515,7 +538,7 @@ function App() {
           onCancel={handleCancel}
         />
       )}
-    
+
     </>
   );
 }

@@ -74,3 +74,21 @@ body {
 option {
   color: white !important;
 }
+.loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: white;
+  z-index: 9999;
+}
+.loader.fade-out {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
