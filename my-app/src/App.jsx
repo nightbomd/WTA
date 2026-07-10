@@ -11,6 +11,7 @@ import Inquiry from './Components/inquiry'
 // Returns YYYY-MM-DD in LOCAL time (not UTC)
 const toLocalDateStr = (date) => {
   const d = new Date(date);
+  
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
@@ -23,7 +24,15 @@ const formatDisplayDate = (dateStr) => {
     weekday: 'long', month: 'short', day: 'numeric'
   });
 };
-
+const weekdays = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday"
+];
 const TYPE_COLORS = {
   Push: { bg: 'var(--span-red)', color: 'var(--color-red)' },
   Pull: { bg: 'rgba(59,130,246,.15)', color: 'var(--color-blue)' },
@@ -62,12 +71,13 @@ const WorkoutHistoryCard = ({ workout, onEdit, onDelete }) => {
             style={{ fontSize: 11, fontWeight: 700, background: ts.bg, color: ts.color, flexShrink: 0 }}>
             {workout.type}
           </span>
-          <span className="text-light fw-semibold text-truncate" style={{ fontSize: 15 }}>
+          <span className="text-light fw-semibold text-truncate" style={{ fontSize: 11 }}>
             {workout.name}
           </span>
+         
         </div>
         <div className="d-flex align-items-center gap-2" style={{ flexShrink: 0 }}>
-          <span className="text-secondary" style={{ fontSize: 12 }}>
+          <span className="text-secondary" style={{ fontSize: 14 }}>
             {workout.exercises?.length || 0} ex
           </span>
           <span style={{ color: '#444', fontSize: 12 }}>{open ? '▲' : '▼'}</span>
@@ -117,14 +127,14 @@ function MainLoad({fade}) {
 
 const histStyles = {
   editBtn: {
-    padding: '8px 18px', background: 'rgba(59,130,246,.12)',
+    padding: '8px 18px', background: 'rgba(95, 139, 210, 0.07)',
     border: '1px solid rgba(59,130,246,.25)', borderRadius: 10,
-    color: '#3b82f6', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+    color: '#71a5f9ff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
   },
   deleteBtn: {
-    padding: '8px 18px', background: 'rgba(239,68,68,.08)',
+    padding: '8px 18px', background: 'rgba(239, 68, 68, 0.03)',
     border: '1px solid rgba(239,68,68,.2)', borderRadius: 10,
-    color: '#ef4444', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+    color: '#a6301dff', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
   },
 };
 
@@ -132,7 +142,7 @@ const histStyles = {
 // --- Main App ---
 function App() {
   const today = toLocalDateStr(new Date());
-
+  console.log(today);
   const [workoutLog, setWorkoutLog] = useState([]);       // all saved workouts
   const [isLoadingWorkout, setIsLoadingWorkout] = useState(false);
   const [editingWorkout, setEditingWorkout] = useState(null); // workout being edited
@@ -231,7 +241,7 @@ function App() {
   const workoutsOnDate = workoutLog.filter(w => w.date === selectedDate);
   // Primary displayed workout (first one on that date, could extend to multiple later)
   const displayWorkout = workoutsOnDate[0] || null;
-
+  console.log(displayWorkout)
   const isToday = selectedDate === today;
 
   if (!isRegistered) {
@@ -275,8 +285,8 @@ function App() {
             {/* ── Date Filter ── */}
             <div className="row px-4 pb-3">
               <div className="col-12">
-                <div className="d-flex align-items-center gap-3 flex-wrap">
-                  <span style={{ fontSize: 11, fontWeight: 700, color: '#555', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                <div className="d-flex text-secondary align-items-center gap-3 flex-wrap">
+                  <span style={{ fontSize: 13, fontWeight: 700,  textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                     Filter by Date
                   </span>
                   <input
@@ -314,7 +324,7 @@ function App() {
                       Back to Today
                     </button>
                   )}
-                  <span style={{ fontSize: 13, color: '#555' }}>
+                  <span className='text-secondary' style={{ fontSize: 15 }}>
                     {formatDisplayDate(selectedDate)}
                   </span>
                 </div>
@@ -326,21 +336,21 @@ function App() {
 
               {/* Today's Workout Card */}
               <div style={{ background: 'var(--card-bg)' }} className="card-workout col-sm-12 col-md-6 col-lg-6 rounded-5 shadow p-4">
-                <p className="text-secondary mb-1" style={{ fontSize: 13 }}>
+                <p className=" mb-1 fs-1" style={{ fontSize: 13 }}>
                   {isToday ? "Today's workout" : formatDisplayDate(selectedDate)}
                 </p>
 
                 {displayWorkout ? (
                   <>
-                    <h2 className="text-light d-flex align-items-center gap-2 flex-wrap mb-3">
+                    <h2 className="text-primary fs-5 d-flex align-items-center gap-2 flex-wrap mb-3">
                       {displayWorkout.name}
-                      <span className="px-2 py-1 rounded-4"
+                      <span className="px-2 py-1 fs-5 rounded-4"
                         style={{ fontSize: 13, ...typeStyle(displayWorkout.type) }}>
                         {displayWorkout.type}
                       </span>
                       {displayWorkout.day && (
                         <span style={{ background: "rgba(241, 187, 99, 0.12)", color: "#f8bd81ff", border: "1px solid rgba(241, 187, 99, 0.25)", borderRadius: '99px', fontSize: 13, padding: '4px 12px', fontWeight: 600 }}>
-                          {/* {weekdays[displayWorkout.day]?.label || "No Date"} */}
+                          {formatDisplayDate(selectedDate)}
                         </span>
                       )}
                     </h2>
@@ -348,7 +358,7 @@ function App() {
                       <div className="d-flex flex-wrap gap-2 mb-3">
                         {displayWorkout.muscles.map(m => (
                           <span key={m} style={{
-                            fontSize: 11, fontWeight: 600, padding: '3px 10px',
+                            fontSize: 12, fontWeight: 600, padding: '3px 10px',
                             background: 'rgba(99,102,241,.12)', color: '#818cf8',
                             border: '1px solid rgba(99,102,241,.2)', borderRadius: 99,
                           }}>{m}</span>
@@ -390,6 +400,10 @@ function App() {
                     </span>
                   </div>
                 )}
+                <div className="streak-calendar mt-4">
+                  <span className="fs-4">Streak: None</span>
+                  {/* calendar goes here */}
+                </div>
               </div>
 
               {/* Weekly Volume Card */}

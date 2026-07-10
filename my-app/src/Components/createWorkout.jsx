@@ -316,7 +316,7 @@ const StepReview = ({ data, exercises, isEditing }) => (
           <div style={{ display: "flex", gap: 12 }}>
             {ex.sets && <span style={S.statChip}>{ex.sets} sets</span>}
             {ex.reps && <span style={S.statChip}>{ex.reps} reps</span>}
-            {ex.weight && <span style={{ ...S.statChip, color: "#3b82f6" }}>{ex.weight} lbs</span>}
+            {ex.weight && <span style={{ ...S.statChip, color:  "#3b82f6" }}>{ex.weight} lbs</span>}
           </div>
         </div>
         {ex.notes && <div style={{ fontSize: 12, color: "#555", marginTop: 6 }}>{ex.notes}</div>}
@@ -428,7 +428,7 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
           <div style={{ background: "#1f1f1f", borderRadius: 99, height: 3 }}>
             <div style={{
               background: isEditing
-                ? "linear-gradient(90deg, #f59e0b, #ef4444)"
+                ? "linear-gradient(90deg, #cd8f25ff, #c38f2eff)"
                 : "linear-gradient(90deg, #3b82f6, #6366f1)",
               borderRadius: 99, height: 3,
               width: `${STEPS[step].progress}%`,
@@ -470,14 +470,14 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
         }
         {step < STEP_COUNT - 1 ? (
           <button onClick={() => canNext() && navigate(1)} disabled={!canNext()}
-            style={{ ...S.nextBtn, opacity: canNext() ? 1 : 0.35 }}>
+            style={{ ...S.nextBtn, opacity: canNext() ? 1 : 0.35, background: isEditing ? "linear-gradient(135deg, #bb8323ff, #c08320ff)" : "linear-gradient(135deg, #3b82f6, #6366f1)" }}>
             Next →
           </button>
         ) : (
           <button onClick={() => { console.log('[CreateWorkout] Save button clicked'); handleSave(); }} style={{
             ...S.saveBtn,
             background: isEditing
-              ? "linear-gradient(135deg, #f59e0b, #ef4444)"
+              ? "linear-gradient(135deg, #bb8323ff, #c08320ff)"
               : "linear-gradient(135deg, #3b82f6, #6366f1)",
           }}>
             {isEditing ? "Save Changes ✓" : "Save Workout ✓"}
@@ -541,7 +541,7 @@ const S = {
     borderRadius: 12, color: "#aaa", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
   },
   nextBtn: {
-    padding: "13px 28px", background: "linear-gradient(135deg, #3b82f6, #6366f1)",
+    padding: "13px 28px", background: "linear-gradient(135deg, #2b63bdff, #1d4c97ff)",
     border: "none", borderRadius: 12, color: "#fff", fontSize: 15, fontWeight: 800,
     cursor: "pointer", letterSpacing: "-0.01em", fontFamily: "inherit", transition: "opacity 0.2s ease",
   },
