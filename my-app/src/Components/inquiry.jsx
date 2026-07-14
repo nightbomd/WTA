@@ -168,7 +168,7 @@ export default function Inquiry( {setIsRegistering }) {
         <main className="container p-5 col-sm-8 col-md-5 col-lg-5 text-center ">
             <h1>Lets Get you  <span style={{ color: "#3592f5ff" }}>Started</span>.</h1>
             <div className="logo text-center">
-                <img style={{ width: '100px', height: '100px', margin: '0 auto' }} src="./public/download.png" alt="Logo"></img>
+                <img style={{ width: '100px', height: '100px', margin: '0 auto' }} src="/public/download.png" alt="Logo"></img>
             </div>
             <ProgressBar bg="#007bff" value={(step / formQuestion.length) * 100} />
             <div className="question-container py-5">

@@ -324,7 +324,7 @@ function App() {
                       Back to Today
                     </button>
                   )}
-                  <span className='text-secondary' style={{ fontSize: 15 }}>
+                  <span className='text-secondary' style={{ fontSize: 12 }}>
                     {formatDisplayDate(selectedDate)}
                   </span>
                 </div>
