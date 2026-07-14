@@ -92,3 +92,11 @@ option {
   opacity: 0;
   transition: opacity 0.5s ease;
 }
+.signup-page {
+  background: black;
+  height: 100vh;
+}
+.signup-logo {
+  max-width: 200px;
+  margin-bottom: 16px;
+}

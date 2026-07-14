@@ -5,6 +5,11 @@ import DonutComponent from './Components/donut'
 import Button from "./Components/btn"
 import CreateWorkout from './Components/createWorkout'
 import Inquiry from './Components/inquiry'
+import SignUp from "./Components/signUp"
+import { onAuthStateChanged } from 'firebase/auth'
+import { auth } from "./firebase.js";
+
+
 //import { weekdays } from '../consts/weekdays'
 
 // --- Helpers ---
@@ -155,6 +160,9 @@ function App() {
   });
   const [loading, setLoading] = useState(true);
   const [fade, setFade] = useState(false);
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -235,6 +243,20 @@ function App() {
     localStorage.removeItem('workoutDraft');
   };
 
+    useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (user) {
+    console.log("Logged in:", user.uid);
+  } else {
+    console.log("Not logged in");
+  }
+
 
 
   // Workouts for the selected date
@@ -244,6 +266,9 @@ function App() {
   console.log(displayWorkout)
   const isToday = selectedDate === today;
 
+  if (!user) {
+    return <SignUp setUser={setUser} />;
+  }
   if (!isRegistered) {
     return <Inquiry setIsRegistering={setIsRegistering} />;
   }
