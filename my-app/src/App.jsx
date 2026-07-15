@@ -124,7 +124,7 @@ const WorkoutHistoryCard = ({ workout, onEdit, onDelete }) => {
 function MainLoad({fade}) {
   return <>
     <div className={`loader ${fade ? 'fade-out' : ''}`} style={{ background: "black", display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-      <img src="./public/app-logo.png" alt="Logo"></img>
+      <img src="/app-logo.png" alt="Logo"></img>
     </div>
 
   </>;
