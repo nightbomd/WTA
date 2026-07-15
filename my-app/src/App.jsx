@@ -160,8 +160,7 @@ function App() {
   });
   const [loading, setLoading] = useState(true);
   const [fade, setFade] = useState(false);
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
+ 
   const [user, setUser] = useState(null);
 
   useEffect(() => {

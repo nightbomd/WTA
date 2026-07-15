@@ -52,6 +52,13 @@ export default function SignUp() {
                     >
                         Sign Up with Google
                     </button>
+                      <button
+                        type="button"
+                        className="btn btn-outline-light w-100"
+                        onClick={handleGoogleSignUp}
+                    >
+                        Sign Up with Apple
+                    </button>
 
                     <div className="d-flex gap-2">
 
