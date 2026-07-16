@@ -22,7 +22,7 @@ export default function SignUp() {
             <div className="signup-card text-center">
 
                 <img
-                    src="/app-logo.png"
+                    src="./public/app-logo.png"
                     alt="Logo"
                     className="signup-logo"
                 />
