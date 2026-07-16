@@ -7,7 +7,9 @@ import CreateWorkout from './Components/createWorkout'
 import Inquiry from './Components/inquiry'
 import SignUp from "./Components/signUp"
 import { onAuthStateChanged } from 'firebase/auth'
-import { auth } from "./firebase.js";
+import { auth, db } from "./firebase.js";
+import { doc, getDoc } from "firebase/firestore";
+
 
 
 //import { weekdays } from '../consts/weekdays'
@@ -16,7 +18,7 @@ import { auth } from "./firebase.js";
 // Returns YYYY-MM-DD in LOCAL time (not UTC)
 const toLocalDateStr = (date) => {
   const d = new Date(date);
-  
+
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
@@ -79,7 +81,7 @@ const WorkoutHistoryCard = ({ workout, onEdit, onDelete }) => {
           <span className="text-light fw-semibold text-truncate" style={{ fontSize: 11 }}>
             {workout.name}
           </span>
-         
+
         </div>
         <div className="d-flex align-items-center gap-2" style={{ flexShrink: 0 }}>
           <span className="text-secondary" style={{ fontSize: 14 }}>
@@ -121,7 +123,7 @@ const WorkoutHistoryCard = ({ workout, onEdit, onDelete }) => {
   );
 };
 
-function MainLoad({fade}) {
+function MainLoad({ fade }) {
   return <>
     <div className={`loader ${fade ? 'fade-out' : ''}`} style={{ background: "black", display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
       <img src="./public/app-logo.png" alt="Logo"></img>
@@ -160,7 +162,7 @@ function App() {
   });
   const [loading, setLoading] = useState(true);
   const [fade, setFade] = useState(false);
- 
+
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -176,8 +178,9 @@ function App() {
   }, []);
 
 
-  useEffect(() => {
+  useEffect(async () => {
     const inquiryData = localStorage.getItem('inquiryData');
+   
     if (inquiryData) {
       setIsRegistering(true);
       const parsed = JSON.parse(inquiryData);
@@ -242,7 +245,7 @@ function App() {
     localStorage.removeItem('workoutDraft');
   };
 
-    useEffect(() => {
+  useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
     });
@@ -310,7 +313,7 @@ function App() {
             <div className="row px-4 pb-3">
               <div className="col-12">
                 <div className="d-flex text-secondary align-items-center gap-3 flex-wrap">
-                  <span style={{ fontSize: 13, fontWeight: 700,  textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                     Filter by Date
                   </span>
                   <input

@@ -1,6 +1,10 @@
 import ProgressBar from "./progressBar";
 import { useState } from "react"
 import Button from "./btn";
+import { db, auth } from "../firebase"
+import { doc, setDoc } from "firebase/firestore";
+
+const user = auth.currentUser;
 
 const formQuestion = [
   {
@@ -114,225 +118,234 @@ const formQuestion = [
   },
 ];
 
-export default function Inquiry( {setIsRegistering }) {
-    const [step, setStep] = useState(0);
-    const [formData, setFormData] = useState({});
-    
-    
-     
-    const getFieldKey = () => {
-      switch(step) {
-        case 0: return "name";
-        case 1: return "ageRange";
-        case 2: return "height";
-        case 3: return "fitnessGoal";
-        case 4: return "experienceLevel";
-        case 5: return "workoutDaysPerWeek";
-        case 6: return "trainingLocation";
-        case 7: return "equipment";
-        case 8: return "priorityMuscles";
-        case 9: return "injuries";
-        default: return "";
-      }
-    };
+export default function Inquiry({ setIsRegistering }) {
+  const [step, setStep] = useState(0);
+  const [formData, setFormData] = useState({});
 
-    const handleChange = (key, value) => {
-      setFormData(prev => ({ ...prev, [key]: value }));
-    };
 
-    const handleHeightWeightChange = (field, value) => {
-      setFormData(prev => ({
-        ...prev,
-        [field]: value
-      }));
-    };
 
-    const handleMultiSelect = (option) => {
-      const key = getFieldKey();
-      const current = formData[key] || [];
-      const updated = current.includes(option)
-        ? current.filter(item => item !== option)
-        : [...current, option];
-      handleChange(key, updated);
-    };
-    const handleSubmit = (e) => {
+  const getFieldKey = () => {
+    switch (step) {
+      case 0: return "name";
+      case 1: return "ageRange";
+      case 2: return "height";
+      case 3: return "fitnessGoal";
+      case 4: return "experienceLevel";
+      case 5: return "workoutDaysPerWeek";
+      case 6: return "trainingLocation";
+      case 7: return "equipment";
+      case 8: return "priorityMuscles";
+      case 9: return "injuries";
+      default: return "";
+    }
+  };
+
+  const handleChange = (key, value) => {
+    setFormData(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleHeightWeightChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleMultiSelect = (option) => {
+    const key = getFieldKey();
+    const current = formData[key] || [];
+    const updated = current.includes(option)
+      ? current.filter(item => item !== option)
+      : [...current, option];
+    handleChange(key, updated);
+  };
+  const handleSubmit = async (e) => {
+    try {
       e.preventDefault();
       console.log("Form submitted:", formData);
       setIsRegistering(true);
       localStorage.setItem('inquiryData', JSON.stringify(formData));
+      await setDoc(
+        doc(db, "users", auth.currentUser.uid, "inquiryData", "form"),
+        formData
+      );
+      console.log("Form Data added:", formData);
+    } catch (error) {
+      console.error("Error submitting form:", error);
     }
+  };
 
-    return (
+  return (
     <>
-   
-        <main className="container p-5 col-sm-8 col-md-5 col-lg-5 text-center ">
-            <h1>Lets Get you  <span style={{ color: "#3592f5ff" }}>Started</span>.</h1>
-            <div className="logo text-center">
-                <img style={{ width: '100px', height: '100px', margin: '0 auto' }} src="./public/download.png" alt="Logo"></img>
-            </div>
-            <ProgressBar bg="#007bff" value={(step / formQuestion.length) * 100} />
-            <div className="question-container py-5">
 
-                <h2 className="mb-5">{formQuestion[step].question}</h2>
-                
-                {step === 0 && (
-                  <input 
-                    type="text" 
-                    className="form-control" 
-                    value={formData.name || ""}
-                    onChange={(e) => handleChange("name", e.target.value)}
+      <main className="container p-5 col-sm-8 col-md-5 col-lg-5 text-center ">
+        <h1>Lets Get you  <span style={{ color: "#3592f5ff" }}>Started</span>.</h1>
+        <div className="logo text-center">
+          <img style={{ width: '100px', height: '100px', margin: '0 auto' }} src="./public/download.png" alt="Logo"></img>
+        </div>
+        <ProgressBar bg="#007bff" value={(step / formQuestion.length) * 100} />
+        <div className="question-container py-5">
+
+          <h2 className="mb-5">{formQuestion[step].question}</h2>
+
+          {step === 0 && (
+            <input
+              type="text"
+              className="form-control"
+              value={formData.name || ""}
+              onChange={(e) => handleChange("name", e.target.value)}
+            />
+          )}
+
+          {step === 1 && (
+            <select
+              className="form-select"
+              value={formData.ageRange || ""}
+              onChange={(e) => handleChange("ageRange", e.target.value)}
+            >
+              {formQuestion[step].options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          )}
+
+          {step === 2 && (
+            <div className="d-flex flex-column gap-3" >
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Height (cm)"
+                value={formData.height || ""}
+                onChange={(e) => handleHeightWeightChange("height", e.target.value)}
+              />
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Weight (kg)"
+                value={formData.weight || ""}
+                onChange={(e) => handleHeightWeightChange("weight", e.target.value)}
+              />
+            </div>
+          )}
+
+          {step === 3 && (
+            <select
+              className="form-select"
+              value={formData.fitnessGoal || ""}
+              onChange={(e) => handleChange("fitnessGoal", e.target.value)}
+            >
+              {formQuestion[step].options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          )}
+
+          {step === 4 && (
+            <select
+              className="form-select"
+              value={formData.experienceLevel || ""}
+              onChange={(e) => handleChange("experienceLevel", e.target.value)}
+            >
+              {formQuestion[step].options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          )}
+
+          {step === 5 && (
+            <select
+              className="form-select"
+              value={formData.workoutDaysPerWeek || ""}
+              onChange={(e) => handleChange("workoutDaysPerWeek", e.target.value)}
+            >
+              {formQuestion[step].options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          )}
+
+          {step === 6 && (
+            <select
+              className="form-select"
+              value={formData.trainingLocation || ""}
+              onChange={(e) => handleChange("trainingLocation", e.target.value)}
+            >
+              {formQuestion[step].options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          )}
+
+          {step === 7 && (
+            <div>
+              {formQuestion[step].options.map((option) => (
+                <label key={option} className="d-block mb-3">
+                  <input
+                    type="checkbox"
+                    checked={(formData.equipment || []).includes(option)}
+                    onChange={() => handleMultiSelect(option)}
+                    className="form-check-input me-2"
                   />
-                )}
+                  {option}
+                </label>
+              ))}
+            </div>
+          )}
 
-                {step === 1 && (
-                    <select 
-                      className="form-select"
-                      value={formData.ageRange || ""}
-                      onChange={(e) => handleChange("ageRange", e.target.value)}
-                    >
-                        {formQuestion[step].options.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {option.label}
-                            </option>
-                        ))}
-                    </select>
-                )}
-
-                {step === 2 && (
-                    <div className="d-flex flex-column gap-3" >
-                        <input 
-                          type="text" 
-                          className="form-control" 
-                          placeholder="Height (cm)"
-                          value={formData.height || ""}
-                          onChange={(e) => handleHeightWeightChange("height", e.target.value)}
-                        />
-                        <input 
-                          type="text" 
-                          className="form-control" 
-                          placeholder="Weight (kg)"
-                          value={formData.weight || ""}
-                          onChange={(e) => handleHeightWeightChange("weight", e.target.value)}
-                        />
-                    </div>
-                )}
-
-                {step === 3 && (
-                    <select 
-                      className="form-select"
-                      value={formData.fitnessGoal || ""}
-                      onChange={(e) => handleChange("fitnessGoal", e.target.value)}
-                    >
-                        {formQuestion[step].options.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {option.label}
-                            </option>
-                        ))}
-                    </select>
-                )}
-
-                {step === 4 && (
-                    <select 
-                      className="form-select"
-                      value={formData.experienceLevel || ""}
-                      onChange={(e) => handleChange("experienceLevel", e.target.value)}
-                    >
-                        {formQuestion[step].options.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {option.label}
-                            </option>
-                        ))}
-                    </select>
-                )}
-
-                {step === 5 && (
-                    <select 
-                      className="form-select"
-                      value={formData.workoutDaysPerWeek || ""}
-                      onChange={(e) => handleChange("workoutDaysPerWeek", e.target.value)}
-                    >
-                        {formQuestion[step].options.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {option.label}
-                            </option>
-                        ))}
-                    </select>
-                )}
-
-                {step === 6 && (
-                    <select 
-                      className="form-select"
-                      value={formData.trainingLocation || ""}
-                      onChange={(e) => handleChange("trainingLocation", e.target.value)}
-                    >
-                        {formQuestion[step].options.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {option.label}
-                            </option>
-                        ))}
-                    </select>
-                )}
-
-                {step === 7 && (
-                  <div>
-                      {formQuestion[step].options.map((option) => (
-                        <label key={option} className="d-block mb-3">
-                          <input 
-                            type="checkbox"
-                            checked={(formData.equipment || []).includes(option)}
-                            onChange={() => handleMultiSelect(option)}
-                            className="form-check-input me-2"
-                          />
-                          {option}
-                        </label>
-                      ))}
-                  </div>
-                )}
-
-                {step === 8 && (
-                  <div>
-                      {formQuestion[step].options.map((option) => (
-                        <label key={option} className="d-block mb-3">
-                          <input 
-                            type="checkbox"
-                            checked={(formData.priorityMuscles || []).includes(option)}
-                            onChange={() => handleMultiSelect(option)}
-                            className="form-check-input me-2"
-                          />
-                          {option}
-                        </label>
-                      ))}
-                  </div>
-                )}
-
-                {step === 9 && (
-                  <textarea 
-                    className="form-control"
-                    rows="5"
-                    placeholder="Describe any injuries or limitations..."
-                    value={formData.injuries || ""}
-                    onChange={(e) => handleChange("injuries", e.target.value)}
+          {step === 8 && (
+            <div>
+              {formQuestion[step].options.map((option) => (
+                <label key={option} className="d-block mb-3">
+                  <input
+                    type="checkbox"
+                    checked={(formData.priorityMuscles || []).includes(option)}
+                    onChange={() => handleMultiSelect(option)}
+                    className="form-check-input me-2"
                   />
-                )}
+                  {option}
+                </label>
+              ))}
             </div>
+          )}
 
-            <div className="d-flex gap-5">
-                <Button 
-                  onClick={() => setStep(step - 1)}
-                  style={{ width: "100% !important" }}
-                  text={"Back"}
-                  bg="#282f36ff"
-                  isDisabled={step === 0}
-                />
-                <Button 
-                  onClick={step === formQuestion.length - 1 ? handleSubmit : () => setStep(step + 1)}
-                  style={{ width: "100% !important" }}
-                  text={step === formQuestion.length - 1 ? "Submit" : "Next"}
-                 
-                />
-            </div>
+          {step === 9 && (
+            <textarea
+              className="form-control"
+              rows="5"
+              placeholder="Describe any injuries or limitations..."
+              value={formData.injuries || ""}
+              onChange={(e) => handleChange("injuries", e.target.value)}
+            />
+          )}
+        </div>
 
-        </main>
-        </>
-    );
+        <div className="d-flex gap-5">
+          <Button
+            onClick={() => setStep(step - 1)}
+            style={{ width: "100% !important" }}
+            text={"Back"}
+            bg="#282f36ff"
+            isDisabled={step === 0}
+          />
+          <Button
+            onClick={step === formQuestion.length - 1 ? handleSubmit : () => setStep(step + 1)}
+            style={{ width: "100% !important" }}
+            text={step === formQuestion.length - 1 ? "Submit" : "Next"}
+
+          />
+        </div>
+
+      </main>
+    </>
+  );
 }
