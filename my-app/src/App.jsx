@@ -12,6 +12,7 @@ import { doc, getDoc } from "firebase/firestore";
 
 
 
+
 //import { weekdays } from '../consts/weekdays'
 
 // --- Helpers ---
@@ -160,11 +161,16 @@ function App() {
     const saved = localStorage.getItem('inquiryData');
     return saved ? JSON.parse(saved) : {};
   });
+
   const [loading, setLoading] = useState(true);
   const [fade, setFade] = useState(false);
 
   const [user, setUser] = useState(null);
-
+  useEffect (() => {
+    if (inquiryData) {
+      setIsRegistering(true);
+    }
+  }, [inquiryData]);
   useEffect(() => {
     const timer = setTimeout(() => {
       setFade(true);
@@ -176,11 +182,14 @@ function App() {
 
     return () => clearTimeout(timer);
   }, []);
+  useEffect(() => {
+    console.log(auth.currentUser)
+  }, [auth.currentUser])
 
 
-  useEffect(async () => {
+  useEffect(() => {
     const inquiryData = localStorage.getItem('inquiryData');
-   
+
     if (inquiryData) {
       setIsRegistering(true);
       const parsed = JSON.parse(inquiryData);
@@ -245,21 +254,46 @@ function App() {
     localStorage.removeItem('workoutDraft');
   };
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
+ useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+    if (user) {
+      console.log("User UID:", user.uid);
+      setUser(user);
+    } else {
+      console.log("No user");
+      setUser(null);
+    }
+  });
 
-    return () => unsubscribe();
-  }, []);
-
-  if (user) {
-    console.log("Logged in:", user.uid);
-  } else {
-    console.log("Not logged in");
-  }
+  return unsubscribe;
+}, []);
 
 
+useEffect(() => {
+  if (!user) return;
+
+  const fetchUserData = async () => {
+    try {
+      const docSnap = await getDoc(
+        doc(db, "users", user.uid)
+      );
+
+      if (docSnap.exists()) {
+        const saved = docSnap.data();
+        setInquiryData(saved.inquiryData || {});
+        console.log(saved);
+      } else {
+        console.log("No user document found.");
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
+  fetchUserData();
+
+}, [user]);
+console.log(inquiryData);
 
   // Workouts for the selected date
   const workoutsOnDate = workoutLog.filter(w => w.date === selectedDate);

@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import Select from './select'
+import { db, auth } from "../firebase";
+import { doc, setDoc } from "firebase/firestore"
 
 // --- Constants ---
 const WORKOUT_TYPES = ["Push", "Pull", "Legs", "Upper", "Lower", "Full Body", "Cardio", "Custom"];
@@ -364,14 +366,30 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
 
   // Auto-save draft only in create mode (and only after initial load)
   useEffect(() => {
-    if (!isEditing && draftLoaded) {
+  if (!isEditing && draftLoaded) {
+    const saveDraft = async () => {
       try {
-        localStorage.setItem('workoutDraft', JSON.stringify({ workoutData, exercises }));
+        const draft = { workoutData, exercises };
+
+        // Save locally
+        localStorage.setItem("workoutDraft", JSON.stringify(draft));
+
+        // Save to Firestore
+        await setDoc(
+          doc(db, "users", auth.currentUser.uid),
+          {
+            workoutDraft: draft,
+          },
+          { merge: true } // prevents overwriting other user data
+        );
       } catch (error) {
         console.error("Failed to save workout draft:", error);
       }
-    }
-  }, [workoutData, exercises, isEditing, draftLoaded]);
+    };
+
+    saveDraft();
+  }
+}, [workoutData, exercises, isEditing, draftLoaded]);
 
   const canNext = () => {
     if (step === 0) return workoutData.name.trim().length > 0 && workoutData.type;

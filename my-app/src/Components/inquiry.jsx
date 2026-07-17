@@ -166,8 +166,11 @@ export default function Inquiry({ setIsRegistering }) {
       setIsRegistering(true);
       localStorage.setItem('inquiryData', JSON.stringify(formData));
       await setDoc(
-        doc(db, "users", auth.currentUser.uid, "inquiryData", "form"),
-        formData
+        doc(db, "users", auth.currentUser.uid),
+        {
+          inquiryData: formData
+        },
+        { merge: true }
       );
       console.log("Form Data added:", formData);
     } catch (error) {
