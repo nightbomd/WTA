@@ -75,6 +75,9 @@ export default function SignUp() {
                         >
                             Sign Up
                         </button>
+                        <button>
+                            back
+                        </button>
 
                     </div>
 

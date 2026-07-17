@@ -161,16 +161,12 @@ function App() {
     const saved = localStorage.getItem('inquiryData');
     return saved ? JSON.parse(saved) : {};
   });
-
   const [loading, setLoading] = useState(true);
   const [fade, setFade] = useState(false);
-
   const [user, setUser] = useState(null);
-  useEffect (() => {
-    if (inquiryData) {
-      setIsRegistering(true);
-    }
-  }, [inquiryData]);
+  const [openSignUp, setOpenSignUp] = useState(false);
+
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       setFade(true);
@@ -280,7 +276,7 @@ useEffect(() => {
 
       if (docSnap.exists()) {
         const saved = docSnap.data();
-        setInquiryData(saved.inquiryData || {});
+        //setInquiryData(saved.inquiryData || {});
         console.log(saved);
       } else {
         console.log("No user document found.");
@@ -302,7 +298,7 @@ console.log(inquiryData);
   console.log(displayWorkout)
   const isToday = selectedDate === today;
 
-  if (!user) {
+  if (openSignUp) {
     return <SignUp setUser={setUser} />;
   }
   if (!isRegistered) {
@@ -324,7 +320,7 @@ console.log(inquiryData);
                 </h1>
               </div>
             )}
-            <div className="create-workout col-sm-12 col-md-6 d-flex flex-column justify-content-start">
+            <div className="create-workout col-sm-12 col-md-6 gap-3 d-flex flex-column justify-content-start">
               {!isLoadingWorkout && (
                 <>
                   {!displayWorkout && isToday && (
@@ -333,7 +329,15 @@ console.log(inquiryData);
                   <Button
                     text={isToday ? 'Log Workout' : `Log for ${formatDisplayDate(selectedDate)}`}
                     onClick={() => { setEditingWorkout(null); setIsLoadingWorkout(true); }}
+                    className="mb-2"
                   />
+                  {user && (
+                    <>
+                     <div className = "d-flex flex-row"><p className="fs-5 text-secondary mb-2"><div class="warning-icon">⚠</div>Current Workouts Are not saved. Create an account to save workouts</p></div> 
+                      <Button text="Create Account" border="#3a9ad9ff" color="#3a9ad9ff" bg="#2564b70b" transparency={0.2} onClick={() => setOpenSignUp(true)} />
+
+                    </>
+                  )}
                 </>
               )}
             </div>

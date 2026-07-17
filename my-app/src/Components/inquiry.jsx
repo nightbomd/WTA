@@ -17,13 +17,11 @@ const formQuestion = [
     question: "Age Range?",
     type: "select",
     options: [
-      { value: "", label: "Select an age range" },
-      { value: "<18", label: "<18" },
-      { value: "18-24", label: "18-24" },
-      { value: "25-34", label: "25-34" },
-      { value: "35-44", label: "35-44" },
-      { value: "45-54", label: "45-54" },
-      { value: "55+", label: "55+" },
+      { id: "18-24", name: "18-24", img: "👶" },
+      { id: "25-34", name: "25-34", img: "🧑" },
+      { id: "35-44", name: "35-44", img: "🧔" },
+      { id: "45-54", name: "45-54", img: "👴" },
+      { id: "55+", name: "55+", img: "👵" },
     ],
   },
   {
@@ -36,12 +34,11 @@ const formQuestion = [
     question: "What's your primary fitness goal?",
     type: "select",
     options: [
-      { value: "", label: "Choose one" },
-      { value: "build-muscle", label: "Build Muscle" },
-      { value: "lose-fat", label: "Lose Fat" },
-      { value: "gain-strength", label: "Gain Strength" },
-      { value: "improve-endurance", label: "Improve Endurance" },
-      { value: "general-health", label: "General Health" },
+      { id: "lose-fat", name: "Lose Fat", img: "🔥" },
+      { id: "build-muscle", name: "Build Muscle", img: "💪" },
+      { id: "gain-strength", name: "Gain Strength", img: "🏋️" },
+      { id: "improve-endurance", name: "Improve Endurance", img: "🏃" },
+      { id: "general-health", name: "General Health", img: "🩺" },
     ],
   },
   {
@@ -49,10 +46,9 @@ const formQuestion = [
     question: "How would you describe your experience/level?",
     type: "select",
     options: [
-      { value: "", label: "Choose one" },
-      { value: "beginner", label: "Beginner" },
-      { value: "intermediate", label: "Intermediate" },
-      { value: "advanced", label: "Advanced" },
+      { id: "beginner", name: "Beginner", image: "👶" },
+      { id: "intermediate", name: "Intermediate", image: "🧑" },
+      { id: "advanced", name: "Advanced", image: "🧔" },
     ],
   },
   {
@@ -60,14 +56,14 @@ const formQuestion = [
     question: "How many days per week do you usually work out?",
     type: "select",
     options: [
-      { value: "", label: "Choose one" },
-      { value: "1", label: "1 Day" },
-      { value: "2", label: "2 Days" },
-      { value: "3", label: "3 Days" },
-      { value: "4", label: "4 Days" },
-      { value: "5", label: "5 Days" },
-      { value: "6", label: "6 Days" },
-      { value: "7", label: "7 Days" },
+
+      { id: "1", name: "1 Day", image: "📅" },
+      { id: "2", name: "2 Days", image: "📅" },
+      { id: "3", name: "3 Days", image: "📅" },
+      { id: "4", name: "4 Days", image: "📅" },
+      { id: "5", name: "5 Days", image: "📅" },
+      { id: "6", name: "6 Days", image: "📅" },
+      { id: "7", name: "7 Days", image: "📅" },
     ],
   },
   {
@@ -75,11 +71,10 @@ const formQuestion = [
     question: "Where do you usually train?",
     type: "select",
     options: [
-      { value: "", label: "Choose one" },
-      { value: "gym", label: "Commercial Gym" },
-      { value: "home", label: "Home Gym" },
-      { value: "both", label: "Both" },
-      { value: "outdoors", label: "Outdoors" },
+      { id: "gym", name: "Commercial Gym", image: "🏢" },
+      { id: "home", name: "Home Gym", image: "🏠" },
+      { id: "both", name: "Both", image: "🏋️‍♂️" },
+      { id: "outdoors", name: "Outdoors", image: "🌳" },
     ],
   },
   {
@@ -87,14 +82,14 @@ const formQuestion = [
     question: "What equipment do you have access to?",
     type: "multiselect",
     options: [
-      "Barbell",
-      "Dumbbells",
-      "Machines",
-      "Cable Machine",
-      "Pull-up Bar",
-      "Resistance Bands",
-      "Kettlebells",
-      "Bodyweight Only",
+      { id: "barbell", name: "Barbell", image: "🏋️" },
+      { id: "dumbbells", name: "Dumbbells", image: "💪" },
+      { id: "machines", name: "Machines", image: "⚙️" },
+      { id: "cable", name: "Cable Machine", image: "🔗" },
+      { id: "pullup", name: "Pull-up Bar", image: "🪜" },
+      { id: "bands", name: "Resistance Bands", image: "🟢" },
+      { id: "kettlebell", name: "Kettlebells", image: "🔔" },
+      { id: "bodyweight", name: "Bodyweight", image: "🤸" }
     ],
   },
   {
@@ -102,13 +97,13 @@ const formQuestion = [
     question: "What muscle groups do you prioritize?",
     type: "multiselect",
     options: [
-      "Chest",
-      "Back",
-      "Shoulders",
-      "Arms",
-      "Legs",
-      "Core",
-      "Full Body",
+      { id: "chest", name: "Chest", img: "💪" },
+      { id: "back", name: "Back", img: "💪" },
+      { id: "shoulders", name: "Shoulders", img: "💪" },
+      { id: "arms", name: "Arms", img: "💪" },
+      { id: "legs", name: "Legs", img: "💪" },
+      { id: "core", name: "Core", img: "💪" },
+      { id: "full-body", name: "Full Body", img: "💪" },
     ],
   },
   {
@@ -117,6 +112,37 @@ const formQuestion = [
     type: "textarea",
   },
 ];
+
+
+function OptionCards({ options, selected, setSelected }) {
+
+  function toggleOption(id) {
+    if (selected.includes(id)) {
+      setSelected(selected.filter(item => item !== id));
+    } else {
+      setSelected([...selected, id]);
+    }
+  }
+
+  return (
+    <div className="option-grid">
+      {options.map((option) => (
+        <button
+          key={option.id}
+          className={`option-card ${selected.includes(option.id) ? "selected" : ""
+            }`}
+          onClick={() => toggleOption(option.id)}
+        >
+          <div className="option-image">
+            {option.image}
+          </div>
+
+          <p>{option.name}</p>
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export default function Inquiry({ setIsRegistering }) {
   const [step, setStep] = useState(0);
@@ -186,7 +212,7 @@ export default function Inquiry({ setIsRegistering }) {
         <div className="logo text-center">
           <img style={{ width: '100px', height: '100px', margin: '0 auto' }} src="./public/download.png" alt="Logo"></img>
         </div>
-        <ProgressBar bg="#007bff" value={(step / formQuestion.length) * 100} />
+        <ProgressBar bg="#007bff" value={Math.floor(((step + 1) / formQuestion.length) * 100)} />
         <div className="question-container py-5">
 
           <h2 className="mb-5">{formQuestion[step].question}</h2>
@@ -201,17 +227,11 @@ export default function Inquiry({ setIsRegistering }) {
           )}
 
           {step === 1 && (
-            <select
-              className="form-select"
-              value={formData.ageRange || ""}
-              onChange={(e) => handleChange("ageRange", e.target.value)}
-            >
-              {formQuestion[step].options.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            <OptionCards
+              options={formQuestion[step].options}
+              selected={formData.ageRange || []}
+              setSelected={(values) => handleChange("ageRange", values)}
+            />
           )}
 
           {step === 2 && (
@@ -234,91 +254,52 @@ export default function Inquiry({ setIsRegistering }) {
           )}
 
           {step === 3 && (
-            <select
-              className="form-select"
-              value={formData.fitnessGoal || ""}
-              onChange={(e) => handleChange("fitnessGoal", e.target.value)}
-            >
-              {formQuestion[step].options.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            <OptionCards
+              options={formQuestion[step].options}
+              selected={formData.fitnessGoal || ["lose-fat", "general-health"]}
+              setSelected={(values) => handleChange("fitnessGoal", values)}
+            />
           )}
 
           {step === 4 && (
-            <select
-              className="form-select"
-              value={formData.experienceLevel || ""}
-              onChange={(e) => handleChange("experienceLevel", e.target.value)}
-            >
-              {formQuestion[step].options.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            <OptionCards
+              options={formQuestion[step].options}
+              selected={formData.experienceLevel || ["beginner"]}
+              setSelected={(values) => handleChange("experienceLevel", values)}
+            />
           )}
 
           {step === 5 && (
-            <select
-              className="form-select"
-              value={formData.workoutDaysPerWeek || ""}
-              onChange={(e) => handleChange("workoutDaysPerWeek", e.target.value)}
-            >
-              {formQuestion[step].options.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            <OptionCards
+              options={formQuestion[step].options}
+              selected={formData.workoutDaysPerWeek || []}
+              setSelected={(values) => handleChange("workoutDaysPerWeek", values)}
+            />
           )}
 
           {step === 6 && (
-            <select
-              className="form-select"
-              value={formData.trainingLocation || ""}
-              onChange={(e) => handleChange("trainingLocation", e.target.value)}
-            >
-              {formQuestion[step].options.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            <OptionCards
+              options={formQuestion[step].options}
+              selected={formData.trainingLocation || ["gym", "home"]}
+              setSelected={(values) => handleChange("trainingLocation", values)}
+            />
           )}
 
           {step === 7 && (
-            <div>
-              {formQuestion[step].options.map((option) => (
-                <label key={option} className="d-block mb-3">
-                  <input
-                    type="checkbox"
-                    checked={(formData.equipment || []).includes(option)}
-                    onChange={() => handleMultiSelect(option)}
-                    className="form-check-input me-2"
-                  />
-                  {option}
-                </label>
-              ))}
-            </div>
+
+            <OptionCards
+              options={formQuestion[step].options}
+              selected={formData.equipment || ["dumbbells", "barbell", "bodyweight"]}
+              setSelected={(values) => handleChange("equipment", values)}
+            />
           )}
 
           {step === 8 && (
-            <div>
-              {formQuestion[step].options.map((option) => (
-                <label key={option} className="d-block mb-3">
-                  <input
-                    type="checkbox"
-                    checked={(formData.priorityMuscles || []).includes(option)}
-                    onChange={() => handleMultiSelect(option)}
-                    className="form-check-input me-2"
-                  />
-                  {option}
-                </label>
-              ))}
-            </div>
+            <OptionCards
+              options={formQuestion[step].options}
+              selected={formData.priorityMuscles || []}
+              setSelected={(values) => handleChange("priorityMuscles", values)}
+            />
           )}
 
           {step === 9 && (

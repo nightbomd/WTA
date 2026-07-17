@@ -70,6 +70,11 @@ body {
   padding: 8px 12px;
   border-bottom: 1px solid #333;
   color: white !important;
+  border: none;
+}
+.form-select:focus {
+  border: 1px solid black !important;
+  outline: none !important;
 }
 option {
   color: white !important;
@@ -99,4 +104,50 @@ option {
 .signup-logo {
   max-width: 200px;
   margin-bottom: 16px;
+}
+.option-box {
+  border: 2px solid grey;
+}
+.option-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  max-width: 600px;
+}
+
+.option-card {
+  border: 2px solid #3e3e3e;
+  background: rgb(22, 22, 22);
+  border-radius: 16px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.736);
+  font-size: 1rem;
+}
+
+.option-card:hover {
+ 
+  border-color: #8888887a;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.option-card.selected {
+  border-color: #454545 !important;
+  background: #000000;
+  box-shadow: 0 0 0 3px rgba(107, 112, 124, 0.2);
+}
+
+.option-image {
+  font-size: 3rem;
+}
+
+.option-card p {
+  margin: 0;
+  font-weight: 600;
 }
