@@ -47,10 +47,10 @@ export default function SignUp() {
 
                     <button
                         type="button"
-                        className="btn btn-outline-light w-100"
+                        className="btn btn-outline-light d-flex align-items-center w-100"
                         onClick={handleGoogleSignUp}
                     >
-                        Sign Up with Google
+                       <img src="./public/google.png" style={{height: "22px", width: "auto"}} className="img-fluid" alt="Google Logo" /> Sign Up with Google
                     </button>
                       <button
                         type="button"
