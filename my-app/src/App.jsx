@@ -164,7 +164,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [fade, setFade] = useState(false);
   const [user, setUser] = useState(null);
-  const [openSignUp, setOpenSignUp] = useState(false);
+  const [openSignUp, setOpenSignUp] = useState(true);
 
   
   useEffect(() => {
@@ -299,11 +299,15 @@ console.log(inquiryData);
   const isToday = selectedDate === today;
 
   if (openSignUp) {
-    return <SignUp setUser={setUser} />;
+    return <SignUp setUser={setUser} openSignUp={openSignUp} setOpenSignUp={setOpenSignUp} />;
+  }
+ if (!user) {
+    return <SignUp setUser={setUser} openSignUp={openSignUp} setOpenSignUp={setOpenSignUp} />;
   }
   if (!isRegistered) {
     return <Inquiry setIsRegistering={setIsRegistering} />;
   }
+
   return (
     <>
       {loading && <MainLoad fade={fade} />}

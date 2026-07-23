@@ -2,7 +2,7 @@ import { useState } from "react";
 import { auth } from "../firebase.js";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
-export default function SignUp() {
+export default function SignUp({openSignUp, setOpenSignUp}) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -18,8 +18,8 @@ export default function SignUp() {
     };
 
     return (
-        <main className="signup-page d-flex justify-content-center align-items-center">
-            <div className="signup-card text-center">
+        <main className="signup-page d-flex justify-content-center align-items-center ">
+            <div className="signup-card text-center col-lg-2 col-md-2 col-sm-6">
 
                 <img
                     src="./public/app-logo.png"
@@ -52,12 +52,13 @@ export default function SignUp() {
                     >
                        <img src="./public/google.png" style={{height: "22px", width: "auto"}} className="img-fluid" alt="Google Logo" /> Sign Up with Google
                     </button>
+                  
                       <button
                         type="button"
-                        className="btn btn-outline-light w-100"
+                        className="btn btn-outline-light  d-flex  align-items-center w-100"
                         onClick={handleGoogleSignUp}
                     >
-                        Sign Up with Apple
+                        <img src="./public/apple-logo.png" style={{height: "30px", width: "auto"}} className="img-fluid" alt="Apple Logo" /> Sign Up with Apple
                     </button>
 
                     <div className="d-flex gap-2">
@@ -75,11 +76,11 @@ export default function SignUp() {
                         >
                             Sign Up
                         </button>
-                        <button>
-                            back
-                        </button>
-
+                      
                     </div>
+                     <button onClick={() => setOpenSignUp(false)}>
+                           Continue Without an Account
+                    </button>
 
                 </form>
 
