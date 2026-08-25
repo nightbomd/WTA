@@ -184,16 +184,38 @@ function App() {
 
 
   useEffect(() => {
-    const inquiryData = localStorage.getItem('inquiryData');
+  if (!user) return;
 
-    if (inquiryData) {
-      setIsRegistering(true);
-      const parsed = JSON.parse(inquiryData);
-      if (Array.isArray(parsed)) {
-        // Do something with the parsed inquiry data
+  const fetchUserData = async () => {
+    try {
+      const docSnap = await getDoc(
+        doc(db, "users", user.uid)
+      );
+
+      if (docSnap.exists()) {
+        const saved = docSnap.data();
+        setInquiryData(saved.inquiryData || {});
+        
+        // Check if inquiry data exists
+        if (saved.inquiryData && Object.keys(saved.inquiryData).length > 0) {
+          setIsRegistering(true);
+        } else {
+          setIsRegistering(false);
+        }
+        console.log(saved);
+      } else {
+        console.log("No user document found.");
+        setIsRegistering(false);
       }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setIsRegistering(false);
     }
-  }, []);
+  };
+
+  fetchUserData();
+
+}, [user]);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -298,15 +320,14 @@ console.log(inquiryData);
   console.log(displayWorkout)
   const isToday = selectedDate === today;
 
-  if (openSignUp) {
-    return <SignUp setUser={setUser} openSignUp={openSignUp} setOpenSignUp={setOpenSignUp} />;
-  }
- if (!user) {
-    return <SignUp setUser={setUser} openSignUp={openSignUp} setOpenSignUp={setOpenSignUp} />;
-  }
-  if (!isRegistered) {
-    return <Inquiry setIsRegistering={setIsRegistering} />;
-  }
+  if (!isRegistered && user) {
+  return <Inquiry setIsRegistering={setIsRegistering} />;
+}
+
+// Show SignUp ONLY if explicitly opened AND user isn't signed in
+if (openSignUp && !user) {
+  return <SignUp setUser={setUser} openSignUp={openSignUp} setOpenSignUp={setOpenSignUp} />;
+}
 
   return (
     <>
@@ -335,7 +356,7 @@ console.log(inquiryData);
                     onClick={() => { setEditingWorkout(null); setIsLoadingWorkout(true); }}
                     className="mb-2"
                   />
-                  {user && (
+                  {!user && (
                     <>
                      <div className = "d-flex flex-row"><p className="fs-5 text-secondary mb-2"><div class="warning-icon">⚠</div>Current Workouts Are not saved. Create an account to save workouts</p></div> 
                       <Button text="Create Account" border="#3a9ad9ff" color="#3a9ad9ff" bg="#2564b70b" transparency={0.2} onClick={() => setOpenSignUp(true)} />

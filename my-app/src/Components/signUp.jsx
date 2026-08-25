@@ -2,7 +2,7 @@ import { useState } from "react";
 import { auth } from "../firebase.js";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
-export default function SignUp({openSignUp, setOpenSignUp}) {
+export default function SignUp({ openSignUp, setOpenSignUp, setUser }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -12,6 +12,8 @@ export default function SignUp({openSignUp, setOpenSignUp}) {
             const result = await signInWithPopup(auth, provider);
             // User signed up successfully
             console.log(result);
+            setUser(result.user); // Update user state
+            setOpenSignUp(false); // Close the signup modal
         } catch (error) {
             console.error(error);
         }
@@ -78,7 +80,10 @@ export default function SignUp({openSignUp, setOpenSignUp}) {
                         </button>
                       
                     </div>
-                     <button onClick={() => setOpenSignUp(false)}>
+                     <button 
+                        type="button"
+                        onClick={() => setOpenSignUp(false)}
+                     >
                            Continue Without an Account
                     </button>
 

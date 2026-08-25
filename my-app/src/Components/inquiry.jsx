@@ -190,7 +190,6 @@ export default function Inquiry({ setIsRegistering }) {
       e.preventDefault();
       console.log("Form submitted:", formData);
       setIsRegistering(true);
-      localStorage.setItem('inquiryData', JSON.stringify(formData));
       await setDoc(
         doc(db, "users", auth.currentUser.uid),
         {
