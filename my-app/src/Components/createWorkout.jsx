@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Select from './select'
+import Icon from './icon'
 import { db, auth } from "../firebase";
 import { doc, setDoc } from "firebase/firestore"
 
@@ -144,8 +145,8 @@ const ExerciseCard = ({ exercise, onUpdate, onRemove }) => {
           )}
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <button onClick={() => setOpen(o => !o)} style={S.iconBtn}>{open ? "▲" : "▼"}</button>
-          <button onClick={onRemove} style={{ ...S.iconBtn, color: "#ef4444" }}>✕</button>
+          <button onClick={() => setOpen(o => !o)} style={S.iconBtn} aria-label={open ? "Collapse exercise" : "Expand exercise"}><Icon name={open ? "chevron-up" : "chevron-down"} size={12} /></button>
+          <button onClick={onRemove} style={{ ...S.iconBtn, color: "#ef4444" }} aria-label="Remove exercise"><Icon name="close" size={13} /></button>
         </div>
       </div>
       {open && (
@@ -222,7 +223,7 @@ const StepExercises = ({ exercises, onUpdate }) => {
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       {exercises.length === 0 && !showAdd && (
         <div style={{ textAlign: "center", padding: "32px 0", color: "#444" }}>
-          <div style={{ fontSize: 36, marginBottom: 10 }}>🏋️</div>
+          <div style={{ fontSize: 36, marginBottom: 10 }}><Icon name="dumbbell" size={36} /></div>
           <div style={{ fontSize: 14 }}>No exercises yet.</div>
           <div style={{ fontSize: 13, marginTop: 4 }}>Tap below to add one.</div>
         </div>
@@ -245,7 +246,7 @@ const StepExercises = ({ exercises, onUpdate }) => {
               style={{ ...S.input, flex: 1 }}
             />
             <button onClick={() => commitExercise(query)} style={S.primaryBtn}>Add</button>
-            <button onClick={() => { setShowAdd(false); setQuery(""); setSuggestions([]); }} style={S.ghostBtn}>✕</button>
+            <button onClick={() => { setShowAdd(false); setQuery(""); setSuggestions([]); }} style={S.ghostBtn} aria-label="Cancel adding exercise"><Icon name="close" size={14} /></button>
           </div>
           {suggestions.length > 0 && (
             <div style={{
@@ -483,13 +484,13 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
       {/* Bottom Nav */}
       <div style={S.bottomNav}>
         {step > 0
-          ? <button onClick={() => navigate(-1)} style={S.backBtn}>← Back</button>
+          ? <button onClick={() => navigate(-1)} style={S.backBtn}><Icon name="arrow-left" size={15} /> Back</button>
           : <div />
         }
         {step < STEP_COUNT - 1 ? (
           <button onClick={() => canNext() && navigate(1)} disabled={!canNext()}
             style={{ ...S.nextBtn, opacity: canNext() ? 1 : 0.35, background: isEditing ? "linear-gradient(135deg, #bb8323ff, #c08320ff)" : "linear-gradient(135deg, #3b82f6, #6366f1)" }}>
-            Next →
+            Next <Icon name="arrow-right" size={15} />
           </button>
         ) : (
           <button onClick={() => { console.log('[CreateWorkout] Save button clicked'); handleSave(); }} style={{
@@ -498,7 +499,7 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
               ? "linear-gradient(135deg, #bb8323ff, #c08320ff)"
               : "linear-gradient(135deg, #3b82f6, #6366f1)",
           }}>
-            {isEditing ? "Save Changes ✓" : "Save Workout ✓"}
+            {isEditing ? "Save Changes" : "Save Workout"} <Icon name="check" size={15} />
           </button>
         )}
       </div>

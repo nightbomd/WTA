@@ -3,6 +3,7 @@ import { useState } from "react"
 import Button from "./btn";
 import { db, auth } from "../firebase"
 import { doc, setDoc } from "firebase/firestore";
+import Icon from "./icon";
 
 const user = auth.currentUser;
 
@@ -17,11 +18,11 @@ const formQuestion = [
     question: "Age Range?",
     type: "select",
     options: [
-      { id: "18-24", name: "18-24", img: "👶" },
-      { id: "25-34", name: "25-34", img: "🧑" },
-      { id: "35-44", name: "35-44", img: "🧔" },
-      { id: "45-54", name: "45-54", img: "👴" },
-      { id: "55+", name: "55+", img: "👵" },
+      { id: "18-24", name: "18-24", image: "baby" },
+      { id: "25-34", name: "25-34", image: "adult" },
+      { id: "35-44", name: "35-44", image: "bearded" },
+      { id: "45-54", name: "45-54", image: "senior" },
+      { id: "55+", name: "55+", image: "senior" },
     ],
   },
   {
@@ -34,11 +35,11 @@ const formQuestion = [
     question: "What's your primary fitness goal?",
     type: "select",
     options: [
-      { id: "lose-fat", name: "Lose Fat", img: "🔥" },
-      { id: "build-muscle", name: "Build Muscle", img: "💪" },
-      { id: "gain-strength", name: "Gain Strength", img: "🏋️" },
-      { id: "improve-endurance", name: "Improve Endurance", img: "🏃" },
-      { id: "general-health", name: "General Health", img: "🩺" },
+      { id: "lose-fat", name: "Lose Fat", image: "flame" },
+      { id: "build-muscle", name: "Build Muscle", image: "flexed-arm" },
+      { id: "gain-strength", name: "Gain Strength", image: "barbell" },
+      { id: "improve-endurance", name: "Improve Endurance", image: "runner" },
+      { id: "general-health", name: "General Health", image: "medical" },
     ],
   },
   {
@@ -46,9 +47,9 @@ const formQuestion = [
     question: "How would you describe your experience/level?",
     type: "select",
     options: [
-      { id: "beginner", name: "Beginner", image: "👶" },
-      { id: "intermediate", name: "Intermediate", image: "🧑" },
-      { id: "advanced", name: "Advanced", image: "🧔" },
+      { id: "beginner", name: "Beginner", image: "baby" },
+      { id: "intermediate", name: "Intermediate", image: "adult" },
+      { id: "advanced", name: "Advanced", image: "bearded" },
     ],
   },
   {
@@ -57,13 +58,13 @@ const formQuestion = [
     type: "select",
     options: [
 
-      { id: "1", name: "1 Day", image: "📅" },
-      { id: "2", name: "2 Days", image: "📅" },
-      { id: "3", name: "3 Days", image: "📅" },
-      { id: "4", name: "4 Days", image: "📅" },
-      { id: "5", name: "5 Days", image: "📅" },
-      { id: "6", name: "6 Days", image: "📅" },
-      { id: "7", name: "7 Days", image: "📅" },
+      { id: "1", name: "1 Day", image: "calendar" },
+      { id: "2", name: "2 Days", image: "calendar" },
+      { id: "3", name: "3 Days", image: "calendar" },
+      { id: "4", name: "4 Days", image: "calendar" },
+      { id: "5", name: "5 Days", image: "calendar" },
+      { id: "6", name: "6 Days", image: "calendar" },
+      { id: "7", name: "7 Days", image: "calendar" },
     ],
   },
   {
@@ -71,10 +72,10 @@ const formQuestion = [
     question: "Where do you usually train?",
     type: "select",
     options: [
-      { id: "gym", name: "Commercial Gym", image: "🏢" },
-      { id: "home", name: "Home Gym", image: "🏠" },
-      { id: "both", name: "Both", image: "🏋️‍♂️" },
-      { id: "outdoors", name: "Outdoors", image: "🌳" },
+      { id: "gym", name: "Commercial Gym", image: "building" },
+      { id: "home", name: "Home Gym", image: "home" },
+      { id: "both", name: "Both", image: "barbell" },
+      { id: "outdoors", name: "Outdoors", image: "tree" },
     ],
   },
   {
@@ -82,14 +83,14 @@ const formQuestion = [
     question: "What equipment do you have access to?",
     type: "multiselect",
     options: [
-      { id: "barbell", name: "Barbell", image: "🏋️" },
-      { id: "dumbbells", name: "Dumbbells", image: "💪" },
-      { id: "machines", name: "Machines", image: "⚙️" },
-      { id: "cable", name: "Cable Machine", image: "🔗" },
-      { id: "pullup", name: "Pull-up Bar", image: "🪜" },
-      { id: "bands", name: "Resistance Bands", image: "🟢" },
-      { id: "kettlebell", name: "Kettlebells", image: "🔔" },
-      { id: "bodyweight", name: "Bodyweight", image: "🤸" }
+      { id: "barbell", name: "Barbell", image: "barbell" },
+      { id: "dumbbells", name: "Dumbbells", image: "flexed-arm" },
+      { id: "machines", name: "Machines", image: "settings" },
+      { id: "cable", name: "Cable Machine", image: "link" },
+      { id: "pullup", name: "Pull-up Bar", image: "pullup" },
+      { id: "bands", name: "Resistance Bands", image: "band" },
+      { id: "kettlebell", name: "Kettlebells", image: "kettlebell" },
+      { id: "bodyweight", name: "Bodyweight", image: "body" }
     ],
   },
   {
@@ -97,13 +98,13 @@ const formQuestion = [
     question: "What muscle groups do you prioritize?",
     type: "multiselect",
     options: [
-      { id: "chest", name: "Chest", img: "💪" },
-      { id: "back", name: "Back", img: "💪" },
-      { id: "shoulders", name: "Shoulders", img: "💪" },
-      { id: "arms", name: "Arms", img: "💪" },
-      { id: "legs", name: "Legs", img: "💪" },
-      { id: "core", name: "Core", img: "💪" },
-      { id: "full-body", name: "Full Body", img: "💪" },
+      { id: "chest", name: "Chest", image: "flexed-arm" },
+      { id: "back", name: "Back", image: "flexed-arm" },
+      { id: "shoulders", name: "Shoulders", image: "flexed-arm" },
+      { id: "arms", name: "Arms", image: "flexed-arm" },
+      { id: "legs", name: "Legs", image: "flexed-arm" },
+      { id: "core", name: "Core", image: "flexed-arm" },
+      { id: "full-body", name: "Full Body", image: "flexed-arm" },
     ],
   },
   {
@@ -134,7 +135,7 @@ function OptionCards({ options, selected, setSelected }) {
           onClick={() => toggleOption(option.id)}
         >
           <div className="option-image">
-            {option.image}
+            <Icon name={option.image} size={42} />
           </div>
 
           <p>{option.name}</p>

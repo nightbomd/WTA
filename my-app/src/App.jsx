@@ -6,6 +6,7 @@ import Button from "./Components/btn"
 import CreateWorkout from './Components/createWorkout'
 import Inquiry from './Components/inquiry'
 import SignUp from "./Components/signUp"
+import Icon from "./Components/icon"
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth, db } from "./firebase.js";
 import { doc, getDoc } from "firebase/firestore";
@@ -88,7 +89,7 @@ const WorkoutHistoryCard = ({ workout, onEdit, onDelete }) => {
           <span className="text-secondary" style={{ fontSize: 14 }}>
             {workout.exercises?.length || 0} ex
           </span>
-          <span style={{ color: '#444', fontSize: 12 }}>{open ? '▲' : '▼'}</span>
+          <span style={{ color: '#444', fontSize: 12 }}><Icon name={open ? "chevron-up" : "chevron-down"} size={12} /></span>
         </div>
       </div>
 
@@ -358,7 +359,7 @@ if (openSignUp && !user) {
                   />
                   {!user && (
                     <>
-                     <div className = "d-flex flex-row"><p className="fs-5 text-secondary mb-2"><div class="warning-icon">⚠</div>Current Workouts Are not saved. Create an account to save workouts</p></div> 
+                     <div className = "d-flex flex-row"><p className="fs-5 text-secondary mb-2"><div class="warning-icon"><Icon name="alert" size={20} /></div>Current Workouts Are not saved. Create an account to save workouts</p></div>
                       <Button text="Create Account" border="#3a9ad9ff" color="#3a9ad9ff" bg="#2564b70b" transparency={0.2} onClick={() => setOpenSignUp(true)} />
 
                     </>
@@ -590,7 +591,7 @@ if (openSignUp && !user) {
 
                   {workoutLog.length === 0 ? (
                     <div className="text-center py-4">
-                      <div style={{ fontSize: 32, marginBottom: 10 }}>📋</div>
+                      <div style={{ fontSize: 32, marginBottom: 10 }}><Icon name="clipboard" size={32} /></div>
                       <p className="text-secondary mb-0">No workouts logged yet. Get after it.</p>
                     </div>
                   ) : (
