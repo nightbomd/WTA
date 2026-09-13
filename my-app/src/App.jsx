@@ -7,7 +7,7 @@ import CreateWorkout from './Components/createWorkout'
 import Inquiry from './Components/inquiry'
 import SignUp from "./Components/signUp"
 import Icon from "./Components/icon"
-import { onAuthStateChanged } from 'firebase/auth'
+import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { auth, db } from "./firebase.js";
 import { doc, getDoc } from "firebase/firestore";
 
@@ -273,6 +273,15 @@ function App() {
     localStorage.removeItem('workoutDraft');
   };
 
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      setOpenSignUp(true);
+    } catch (error) {
+      console.error("Failed to sign out:", error);
+    }
+  };
+
  useEffect(() => {
   const unsubscribe = onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -357,6 +366,9 @@ if (openSignUp && !user) {
                     onClick={() => { setEditingWorkout(null); setIsLoadingWorkout(true); }}
                     className="mb-2"
                   />
+                  {user && (
+                    <Button text="Sign Out" bg="#282f36ff" onClick={handleSignOut} />
+                  )}
                   {!user && (
                     <>
                      <div className = "d-flex flex-row"><p className="fs-5 text-secondary mb-2"><div class="warning-icon"><Icon name="alert" size={20} /></div>Current Workouts Are not saved. Create an account to save workouts</p></div>
