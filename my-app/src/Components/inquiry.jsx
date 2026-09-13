@@ -98,13 +98,13 @@ const formQuestion = [
     question: "What muscle groups do you prioritize?",
     type: "multiselect",
     options: [
-      { id: "chest", name: "Chest", image: "flexed-arm" },
-      { id: "back", name: "Back", image: "flexed-arm" },
-      { id: "shoulders", name: "Shoulders", image: "flexed-arm" },
-      { id: "arms", name: "Arms", image: "flexed-arm" },
-      { id: "legs", name: "Legs", image: "flexed-arm" },
-      { id: "core", name: "Core", image: "flexed-arm" },
-      { id: "full-body", name: "Full Body", image: "flexed-arm" },
+      { id: "chest", name: "Chest", image: "muscle-chest" },
+      { id: "back", name: "Back", image: "muscle-back" },
+      { id: "shoulders", name: "Shoulders", image: "muscle-shoulders" },
+      { id: "arms", name: "Arms", image: "muscle-arms" },
+      { id: "legs", name: "Legs", image: "muscle-legs" },
+      { id: "core", name: "Core", image: "muscle-core" },
+      { id: "full-body", name: "Full Body", image: "muscle-full-body" },
     ],
   },
   {
@@ -145,7 +145,7 @@ function OptionCards({ options, selected, setSelected }) {
   );
 }
 
-export default function Inquiry({ setIsRegistering }) {
+export default function Inquiry({ setIsRegistering, setInquiryData }) {
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({});
 
@@ -190,14 +190,18 @@ export default function Inquiry({ setIsRegistering }) {
     try {
       e.preventDefault();
       console.log("Form submitted:", formData);
+      localStorage.setItem("inquiryData", JSON.stringify(formData));
+      setInquiryData(formData);
       setIsRegistering(true);
-      await setDoc(
-        doc(db, "users", auth.currentUser.uid),
-        {
-          inquiryData: formData
-        },
-        { merge: true }
-      );
+      if (auth.currentUser) {
+        await setDoc(
+          doc(db, "users", auth.currentUser.uid),
+          {
+            inquiryData: formData
+          },
+          { merge: true }
+        );
+      }
       console.log("Form Data added:", formData);
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -207,15 +211,15 @@ export default function Inquiry({ setIsRegistering }) {
   return (
     <>
 
-      <main className="container p-5 col-sm-8 col-md-5 col-lg-5 text-center ">
-        <h1>Lets Get you  <span style={{ color: "#3592f5ff" }}>Started</span>.</h1>
+      <main className="container p-5 col-sm-8 col-md-5 col-lg-5 text-center inquiry-page">
+        <h1 className="inquiry-heading">Lets Get you <span style={{ color: "#3592f5ff" }}>Started</span>.</h1>
         <div className="logo text-center">
-          <img style={{ width: '100px', height: '100px', margin: '0 auto' }} src="./public/download.png" alt="Logo"></img>
+          <img style={{ width: '100px', height: '100px', margin: '0 auto' }} src={`${import.meta.env.BASE_URL}download.png`} alt="Logo"></img>
         </div>
         <ProgressBar bg="#007bff" value={Math.floor(((step + 1) / formQuestion.length) * 100)} />
         <div className="question-container py-5">
 
-          <h2 className="mb-5">{formQuestion[step].question}</h2>
+          <h2 className="mb-5 inquiry-question">{formQuestion[step].question}</h2>
 
           {step === 0 && (
             <input

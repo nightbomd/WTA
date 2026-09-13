@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Select from './select'
 import Icon from './icon'
 import { db, auth } from "../firebase";
-import { doc, setDoc } from "firebase/firestore"
+import { doc, getDoc, setDoc } from "firebase/firestore"
 
 // --- Constants ---
 const WORKOUT_TYPES = ["Push", "Pull", "Legs", "Upper", "Lower", "Full Body", "Cardio", "Custom"];
@@ -345,37 +345,42 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
 
   // Load initialData (edit mode) OR draft (new mode)
   useEffect(() => {
-    if (isEditing) {
-      setWorkoutData({ name: initialData.name, type: initialData.type, muscles: initialData.muscles || [] });
-      setExercises(initialData.exercises || []);
-    } else {
-      const draft = localStorage.getItem('workoutDraft');
-      if (draft) {
+    let cancelled = false;
+
+    const loadWorkout = async () => {
+      if (isEditing) {
+        setWorkoutData({ name: initialData.name, type: initialData.type, muscles: initialData.muscles || [] });
+        setExercises(initialData.exercises || []);
+      } else if (auth.currentUser) {
         try {
-          const parsed = JSON.parse(draft);
-          setWorkoutData(parsed.workoutData || { name: "", type: "", muscles: [] });
-          setExercises(parsed.exercises || []);
+          const userDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
+          if (cancelled) return;
+          const draft = userDoc.exists() ? userDoc.data().workoutDraft : null;
+          if (draft) {
+            setWorkoutData(draft.workoutData || { name: "", type: "", muscles: [] });
+            setExercises(draft.exercises || []);
+          }
         } catch (error) {
-          console.error("Failed to parse workout draft:", error);
-          setWorkoutData({ name: "", type: "", muscles: [] });
-          setExercises([]);
+          console.error("Failed to load workout draft:", error);
         }
       }
-    }
-    setDraftLoaded(true);
+
+      if (!cancelled) setDraftLoaded(true);
+    };
+
+    loadWorkout();
+    return () => {
+      cancelled = true;
+    };
   }, [isEditing, initialData]);
 
   // Auto-save draft only in create mode (and only after initial load)
   useEffect(() => {
-  if (!isEditing && draftLoaded) {
+  if (!isEditing && draftLoaded && auth.currentUser) {
     const saveDraft = async () => {
       try {
         const draft = { workoutData, exercises };
 
-        // Save locally
-        localStorage.setItem("workoutDraft", JSON.stringify(draft));
-
-        // Save to Firestore
         await setDoc(
           doc(db, "users", auth.currentUser.uid),
           {
@@ -410,7 +415,6 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
     console.log('[CreateWorkout] handleSave calling onSave with:', payload);
     onSave?.(payload);
     console.log('[CreateWorkout] onSave callback completed');
-    localStorage.removeItem('workoutDraft');
   };
 
   if (!isLoadingWorkout) return null;

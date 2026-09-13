@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import ProgressBar from './Components/progressBar'
 import './App.css'
 import DonutComponent from './Components/donut'
@@ -7,14 +7,15 @@ import CreateWorkout from './Components/createWorkout'
 import Inquiry from './Components/inquiry'
 import SignUp from "./Components/signUp"
 import Icon from "./Components/icon"
+import MobileNavbar from "./Components/mobileNavbar"
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { auth, db } from "./firebase.js";
-import { doc, getDoc } from "firebase/firestore";
+import { deleteField, doc, getDoc, setDoc } from "firebase/firestore";
 
 
 
 
-//import { weekdays } from '../consts/weekdays'
+
 
 // --- Helpers ---
 // Returns YYYY-MM-DD in LOCAL time (not UTC)
@@ -56,6 +57,15 @@ const TYPE_COLORS = {
 const typeStyle = (type) =>
   TYPE_COLORS[type] || { bg: 'rgba(148,163,184,.15)', color: '#94a3b8' };
 
+const getLocalInquiryData = () => {
+  try {
+    const saved = localStorage.getItem('inquiryData');
+    return saved ? JSON.parse(saved) : {};
+  } catch (error) {
+    console.error("Failed to load inquiry data:", error);
+    return {};
+  }
+};
 
 // --- Workout History Card ---
 const WorkoutHistoryCard = ({ workout, onEdit, onDelete }) => {
@@ -80,7 +90,7 @@ const WorkoutHistoryCard = ({ workout, onEdit, onDelete }) => {
             style={{ fontSize: 11, fontWeight: 700, background: ts.bg, color: ts.color, flexShrink: 0 }}>
             {workout.type}
           </span>
-          <span className="text-light fw-semibold text-truncate" style={{ fontSize: 11 }}>
+          <span className="text-light fw-semibold text-truncate workout-history-name">
             {workout.name}
           </span>
 
@@ -128,7 +138,7 @@ const WorkoutHistoryCard = ({ workout, onEdit, onDelete }) => {
 function MainLoad({ fade }) {
   return <>
     <div className={`loader ${fade ? 'fade-out' : ''}`} style={{ background: "black", display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-      <img src="./public/app-logo.png" alt="Logo"></img>
+      <img src={`${import.meta.env.BASE_URL}app-logo.png`} alt="Logo"></img>
     </div>
 
   </>;
@@ -156,16 +166,14 @@ function App() {
   const [isLoadingWorkout, setIsLoadingWorkout] = useState(false);
   const [editingWorkout, setEditingWorkout] = useState(null); // workout being edited
   const [selectedDate, setSelectedDate] = useState(today);
-  const isMounted = useRef(false); // skip saving on initial render
-  const [isRegistered, setIsRegistering] = useState(false);
-  const [inquiryData, setInquiryData] = useState(() => {
-    const saved = localStorage.getItem('inquiryData');
-    return saved ? JSON.parse(saved) : {};
-  });
+  const [isRegistered, setIsRegistering] = useState(() => Object.keys(getLocalInquiryData()).length > 0);
+  const [inquiryData, setInquiryData] = useState(getLocalInquiryData);
   const [loading, setLoading] = useState(true);
   const [fade, setFade] = useState(false);
   const [user, setUser] = useState(null);
   const [openSignUp, setOpenSignUp] = useState(true);
+  const [isGuestMode, setIsGuestMode] = useState(false);
+  const [workoutsLoadedForUser, setWorkoutsLoadedForUser] = useState(null);
 
   
   useEffect(() => {
@@ -185,64 +193,75 @@ function App() {
 
 
   useEffect(() => {
-  if (!user) return;
+    if (!user) {
+      setWorkoutsLoadedForUser(null);
+      return;
+    }
 
-  const fetchUserData = async () => {
-    try {
-      const docSnap = await getDoc(
-        doc(db, "users", user.uid)
-      );
+    let cancelled = false;
+    setWorkoutsLoadedForUser(null);
 
-      if (docSnap.exists()) {
-        const saved = docSnap.data();
-        setInquiryData(saved.inquiryData || {});
-        
-        // Check if inquiry data exists
-        if (saved.inquiryData && Object.keys(saved.inquiryData).length > 0) {
-          setIsRegistering(true);
+    const fetchUserData = async () => {
+      try {
+        const docSnap = await getDoc(doc(db, "users", user.uid));
+        if (cancelled) return;
+
+        if (docSnap.exists()) {
+          const saved = docSnap.data();
+          const savedInquiry = saved.inquiryData || {};
+          setInquiryData(savedInquiry);
+          setIsRegistering(Object.keys(savedInquiry).length > 0);
+          setWorkoutLog(Array.isArray(saved.workoutLog) ? saved.workoutLog : []);
         } else {
           setIsRegistering(false);
+          setWorkoutLog([]);
         }
-        console.log(saved);
-      } else {
-        console.log("No user document found.");
+
+        setWorkoutsLoadedForUser(user.uid);
+      } catch (error) {
+        if (cancelled) return;
+        console.error("Error fetching user data:", error);
         setIsRegistering(false);
+        setWorkoutLog([]);
       }
+    };
+
+    fetchUserData();
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
+  useEffect(() => {
+    if (!user || isGuestMode || workoutsLoadedForUser !== user.uid) return;
+
+    const saveWorkoutLog = async () => {
+      try {
+        await setDoc(
+          doc(db, "users", user.uid),
+          { workoutLog },
+          { merge: true }
+        );
+      } catch (error) {
+        console.error("Failed to save workout log:", error);
+      }
+    };
+
+    saveWorkoutLog();
+  }, [workoutLog, user, isGuestMode, workoutsLoadedForUser]);
+
+  const clearWorkoutDraft = async () => {
+    if (!user) return;
+    try {
+      await setDoc(
+        doc(db, "users", user.uid),
+        { workoutDraft: deleteField() },
+        { merge: true }
+      );
     } catch (error) {
-      console.error("Error fetching user data:", error);
-      setIsRegistering(false);
+      console.error("Failed to clear workout draft:", error);
     }
   };
-
-  fetchUserData();
-
-}, [user]);
-
-  // Load from localStorage on mount
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem('workoutLog');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed)) {
-          setWorkoutLog(parsed);
-        }
-      }
-    } catch (error) {
-      console.error("Failed to load workout log:", error);
-    }
-    isMounted.current = true;
-  }, []);
-
-  // Persist workoutLog — but skip the initial render so we don't overwrite before loading
-  useEffect(() => {
-    if (!isMounted.current) return;
-    try {
-      localStorage.setItem('workoutLog', JSON.stringify(workoutLog));
-    } catch (error) {
-      console.error("Failed to save workout log:", error);
-    }
-  }, [workoutLog]);
 
   const handleSave = (workout) => {
     if (editingWorkout) {
@@ -255,7 +274,7 @@ function App() {
     }
     setEditingWorkout(null);
     setIsLoadingWorkout(false);
-    localStorage.removeItem('workoutDraft');
+    clearWorkoutDraft();
   };
 
   const handleEdit = (workout) => {
@@ -270,16 +289,31 @@ function App() {
   const handleCancel = () => {
     setEditingWorkout(null);
     setIsLoadingWorkout(false);
-    localStorage.removeItem('workoutDraft');
+    clearWorkoutDraft();
   };
 
   const handleSignOut = async () => {
     try {
       await signOut(auth);
+      setIsGuestMode(false);
       setOpenSignUp(true);
     } catch (error) {
       console.error("Failed to sign out:", error);
     }
+  };
+
+  const handleContinueWithoutAccount = () => {
+    const savedInquiryData = getLocalInquiryData();
+    setInquiryData(savedInquiryData);
+    setIsRegistering(Object.keys(savedInquiryData).length > 0);
+    setIsGuestMode(true);
+    setWorkoutLog([]);
+  };
+
+  const handleSignedIn = () => {
+    setWorkoutLog([]);
+    setWorkoutsLoadedForUser(null);
+    setIsGuestMode(false);
   };
 
  useEffect(() => {
@@ -297,30 +331,6 @@ function App() {
 }, []);
 
 
-useEffect(() => {
-  if (!user) return;
-
-  const fetchUserData = async () => {
-    try {
-      const docSnap = await getDoc(
-        doc(db, "users", user.uid)
-      );
-
-      if (docSnap.exists()) {
-        const saved = docSnap.data();
-        //setInquiryData(saved.inquiryData || {});
-        console.log(saved);
-      } else {
-        console.log("No user document found.");
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  };
-
-  fetchUserData();
-
-}, [user]);
 console.log(inquiryData);
 
   // Workouts for the selected date
@@ -330,28 +340,28 @@ console.log(inquiryData);
   console.log(displayWorkout)
   const isToday = selectedDate === today;
 
-  if (!isRegistered && user) {
-  return <Inquiry setIsRegistering={setIsRegistering} />;
+  if (!isRegistered && (user || !openSignUp)) {
+  return <Inquiry setIsRegistering={setIsRegistering} setInquiryData={setInquiryData} />;
 }
 
 // Show SignUp ONLY if explicitly opened AND user isn't signed in
 if (openSignUp && !user) {
-  return <SignUp setUser={setUser} openSignUp={openSignUp} setOpenSignUp={setOpenSignUp} />;
+  return <SignUp setUser={setUser} openSignUp={openSignUp} setOpenSignUp={setOpenSignUp} onContinueWithoutAccount={handleContinueWithoutAccount} onSignedIn={handleSignedIn} />;
 }
 
   return (
     <>
       {loading && <MainLoad fade={fade} />}
-      <div style={{ background: 'var(--bg-color)' }} className="container-fluid">
+      <div style={{ background: 'var(--bg-color)' }} className="container-fluid app-shell">
 
         {/* ── Header ── */}
         <div className="row g-4 p-4">
           <header className="row w-100 g-4">
             {!isLoadingWorkout && (
               <div className="col-sm-12 col-md-6">
-                <h1 className="mb-0" style={{ fontSize: 'var(--font-size-header)' }}>
-                  <span className="text-light">Welcome,</span><br />
-                  <span style={{ color: 'var(--color-blue)' }}>{inquiryData.name}</span>
+                <h1 className="mb-0 app-greeting">
+                  <span className="text-light app-greeting__label">Welcome,</span>
+                  <span className="app-greeting__name" style={{ color: 'var(--color-blue)' }}>{inquiryData.name}</span>
                 </h1>
               </div>
             )}
@@ -359,7 +369,7 @@ if (openSignUp && !user) {
               {!isLoadingWorkout && (
                 <>
                   {!displayWorkout && isToday && (
-                    <p className="fs-5 text-secondary mb-2">No workout logged today.</p>
+                    <p className="fs-5 text-secondary mb-2 dashboard-status">No workout logged today. Log one to start!</p>
                   )}
                   <Button
                     text={isToday ? 'Log Workout' : `Log for ${formatDisplayDate(selectedDate)}`}
@@ -371,7 +381,7 @@ if (openSignUp && !user) {
                   )}
                   {!user && (
                     <>
-                     <div className = "d-flex flex-row"><p className="fs-5 text-secondary mb-2"><div class="warning-icon"><Icon name="alert" size={20} /></div>Current Workouts Are not saved. Create an account to save workouts</p></div>
+                     <div className="d-flex flex-row"><p className="fs-5 text-secondary mb-2 account-warning"><span className="warning-icon"><Icon name="alert" size={20} /></span>Current workouts are not saved. Create an account to save workouts.</p></div>
                       <Button text="Create Account" border="#3a9ad9ff" color="#3a9ad9ff" bg="#2564b70b" transparency={0.2} onClick={() => setOpenSignUp(true)} />
 
                     </>
@@ -389,7 +399,7 @@ if (openSignUp && !user) {
             <div className="row px-4 pb-3">
               <div className="col-12">
                 <div className="d-flex text-secondary align-items-center gap-3 flex-wrap">
-                  <span style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  <span className="filter-label" style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                     Filter by Date
                   </span>
                   <input
@@ -427,7 +437,7 @@ if (openSignUp && !user) {
                       Back to Today
                     </button>
                   )}
-                  <span className='text-secondary' style={{ fontSize: 12 }}>
+                  <span className="text-secondary filter-date" style={{ fontSize: 12 }}>
                     {formatDisplayDate(selectedDate)}
                   </span>
                 </div>
@@ -439,13 +449,13 @@ if (openSignUp && !user) {
 
               {/* Today's Workout Card */}
               <div style={{ background: 'var(--card-bg)' }} className="card-workout col-sm-12 col-md-6 col-lg-6 rounded-5 shadow p-4">
-                <p className=" mb-1 fs-1" style={{ fontSize: 13 }}>
+                <p className="card-eyebrow card-eyebrow--workout">
                   {isToday ? "Today's workout" : formatDisplayDate(selectedDate)}
                 </p>
 
                 {displayWorkout ? (
                   <>
-                    <h2 className="text-primary fs-5 d-flex align-items-center gap-2 flex-wrap mb-3">
+                    <h2 className="d-flex align-items-center gap-2 flex-wrap workout-heading">
                       {displayWorkout.name}
                       <span className="px-2 py-1 fs-5 rounded-4"
                         style={{ fontSize: 13, ...typeStyle(displayWorkout.type) }}>
@@ -480,8 +490,8 @@ if (openSignUp && !user) {
                             <i className="bi bi-check-circle me-3"
                               style={{ fontSize: '2rem', color: '#2264c6' }} />
                             <div className="d-flex flex-column">
-                              <span style={{ fontSize: '1.1rem', fontWeight: 600 }}>{exercise.name}</span>
-                              <span className="text-secondary" style={{ fontSize: 13 }}>
+                              <span className="today-exercise-name">{exercise.name}</span>
+                              <span className="today-exercise-details">
                                 {[exercise.sets && `${exercise.sets} sets`,
                                 exercise.reps && `${exercise.reps} reps`,
                                 exercise.weight && `@ ${exercise.weight} lbs`
@@ -498,26 +508,27 @@ if (openSignUp && !user) {
                   </>
                 ) : (
                   <div className="d-flex flex-column align-items-start gap-2 mt-2">
-                    <span className="text-secondary" style={{ fontSize: 15 }}>
+                    <span className="today-workout-empty">
                       No workout logged{isToday ? ' today' : ' on this date'}.
                     </span>
                   </div>
                 )}
                 <div className="streak-calendar mt-4">
-                  <span className="fs-4">Streak: None</span>
+                  <span className="streak-label">Streak:</span>{' '}
+                  <span className="streak-value">None</span>
                   {/* calendar goes here */}
                 </div>
               </div>
 
               {/* Weekly Volume Card */}
               <div style={{ background: 'var(--card-bg)' }} className="card-workout col-sm-12 col-md-6 col-lg-6 rounded-5 shadow p-4">
-                <h2 className="text-light mb-3">Weekly Volume ({inquiryData.workoutDaysPerWeek} days)</h2>
+                <h2 className="text-light section-heading">Weekly Volume <span className="section-heading__detail">({inquiryData.workoutDaysPerWeek} days)</span></h2>
                 {displayWorkout?.exercises?.length > 0 ? (
                   <div className="exercise-table">
                     <table className="table table-dark table-borderless mb-0" style={{ background: 'transparent' }}>
                       <thead>
                         <tr style={{ borderBottom: '1px solid #222' }}>
-                          <th style={{ color: '#666', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', paddingLeft: 0 }}>Exercise</th>
+                          <th style={{ color: '#666', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Exercise</th>
                           <th style={{ color: '#666', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Sets</th>
                           <th style={{ color: '#666', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Reps</th>
                           <th style={{ color: '#666', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Weight</th>
@@ -526,7 +537,7 @@ if (openSignUp && !user) {
                       <tbody>
                         {displayWorkout.exercises.map((exercise, idx) => (
                           <tr key={idx} style={{ borderBottom: '1px solid #1a1a1a' }}>
-                            <td style={{ color: '#e0e0e0', paddingLeft: 0 }}>{exercise.name}</td>
+                            <td style={{ color: '#e0e0e0' }}>{exercise.name}</td>
                             <td style={{ color: '#e0e0e0' }}>{exercise.sets || '—'}</td>
                             <td style={{ color: '#e0e0e0' }}>{exercise.reps || '—'}</td>
                             <td style={{ color: exercise.weight ? '#3b82f6' : '#444' }}>
@@ -546,40 +557,40 @@ if (openSignUp && !user) {
             {/* ── Calorie + Stats ── */}
             <div className="row g-4 px-4 pb-4">
               <div style={{ background: 'var(--card-bg)' }} className="col-sm-12 col-md-6 col-lg-6 calorie-tracker rounded-5 p-4">
-                <h2 className="text-light">Calorie Tracker</h2>
+                <h2 className="text-light section-heading">Calorie Tracker</h2>
                 <DonutComponent value={2120} bg="var(--color-blue)" />
                 <div className="protein">
-                  <h3 className="text-light">Protein: 150g</h3>
+                  <h3 className="text-light metric-heading">Protein: <strong>150g</strong></h3>
                   <ProgressBar text="72/150g" value={75} bg="var(--color-red)" />
                 </div>
                 <div className="carbs">
-                  <h3 className="text-light">Carbs: 200g</h3>
+                  <h3 className="text-light metric-heading">Carbs: <strong>200g</strong></h3>
                   <ProgressBar text="150/200g" value={65} bg="var(--color-yellow)" />
                 </div>
                 <div className="carbs">
-                  <h3 className="text-light">Fats: 48g</h3>
+                  <h3 className="text-light metric-heading">Fats: <strong>48g</strong></h3>
                   <ProgressBar text="16/48g" value={32} bg="var(--color-green)" />
                 </div>
               </div>
               <div style={{ background: 'var(--card-bg)' }} className="col-sm-12 col-md-6 col-lg-6 rounded-5 p-4">
-                <h2 className="text-light fs-1 mb-3">Stats</h2>
+                <h2 className="text-light section-heading">Stats</h2>
                 <div className="row justify-content-center g-3">
                   <div className="col-12 col-md-4">
                     <div style={{ backgroundColor: '#332E2E' }} className="p-4 rounded-5 text-center h-100">
-                      <p className="fs-1 fw-bold mb-1" style={{ color: 'var(--color-blue)' }}>{inquiryData.weight || '—'}kg</p>
-                      <span className="text-secondary d-block">Weight</span>
+                      <p className="fs-1 fw-bold mb-1 stat-value" style={{ color: 'var(--color-blue)' }}>{inquiryData.weight || '—'}kg</p>
+                      <span className="text-secondary d-block stat-label">Weight</span>
                     </div>
                   </div>
                   <div className="col-12 col-md-4">
                     <div style={{ backgroundColor: '#332E2E' }} className="p-4 rounded-5 text-center h-100">
-                      <p className="fs-1 fw-bold mb-1" style={{ color: 'var(--color-blue)' }}>15%</p>
-                      <span className="text-secondary d-block">Body Fat</span>
+                      <p className="fs-1 fw-bold mb-1 stat-value" style={{ color: 'var(--color-blue)' }}>15%</p>
+                      <span className="text-secondary d-block stat-label">Body Fat</span>
                     </div>
                   </div>
                   <div className="col-12 col-md-4">
                     <div style={{ backgroundColor: '#332E2E' }} className="p-4 rounded-5 text-center h-100">
-                      <p className="fs-1 fw-bold mb-1" style={{ color: 'var(--color-blue)' }}>Sep 1</p>
-                      <span className="text-secondary d-block">Deadline</span>
+                      <p className="fs-1 fw-bold mb-1 stat-value" style={{ color: 'var(--color-blue)' }}>Sep 1</p>
+                      <span className="text-secondary d-block stat-label">Deadline</span>
                     </div>
                   </div>
                 </div>
@@ -591,8 +602,8 @@ if (openSignUp && !user) {
               <div className="col-12">
                 <div style={{ background: 'var(--card-bg)' }} className="rounded-5 p-4">
                   <div className="d-flex align-items-center justify-content-between mb-4">
-                    <h2 className="text-light mb-0">Workout History</h2>
-                    <span style={{
+                    <h2 className="text-light section-heading mb-0">Workout History</h2>
+                    <span className="history-count" style={{
                       fontSize: 12, fontWeight: 700, color: '#555',
                       background: '#1a1a1a', border: '1px solid #2a2a2a',
                       borderRadius: 99, padding: '4px 12px'
@@ -618,7 +629,7 @@ if (openSignUp && !user) {
                         }, {})
                     ).map(([date, workouts]) => (
                       <div key={date} className="mb-4">
-                        <div style={{
+                        <div className="history-date-label" style={{
                           fontSize: 11, fontWeight: 700, color: date === today ? '#3b82f6' : '#555',
                           textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10,
                           paddingBottom: 8, borderBottom: '1px solid #1e1e1e',
@@ -645,6 +656,8 @@ if (openSignUp && !user) {
           </main>
         )}
       </div>
+
+      {!isLoadingWorkout && <MobileNavbar />}
 
       {/* ── CreateWorkout overlay ── */}
       {isLoadingWorkout && (
