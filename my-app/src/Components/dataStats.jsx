@@ -1,45 +1,47 @@
-import { useEffect, useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "../firebase";
+import Icon from "./icon";
 
-function DataStats() {
-  const [inquiryData, setInquiryData] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
+const displayValue = (value, suffix = "") => {
+  if (Array.isArray(value)) return value.length ? value.join(", ") : "Not provided";
+  return value ? `${value}${suffix}` : "Not provided";
+};
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        const userReference = doc(db, "users", user.uid);
-        const userSnapshot = await getDoc(userReference);
-
-        if (userSnapshot.exists()) {
-          setInquiryData(userSnapshot.data().inquiryData ?? {});
-        }
-      } catch (error) {
-        console.error("Failed to load inquiry data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    });
-
-    return unsubscribe;
-  }, []);
-
-  if (isLoading) {
-    return <p>Loading statistics...</p>;
-  }
+function DataStats({ inquiryData = {}, onBack }) {
+  const fields = [
+    ["Name", displayValue(inquiryData.name)],
+    ["Age range", displayValue(inquiryData.ageRange)],
+    ["Height", displayValue(inquiryData.height, " cm")],
+    ["Weight", displayValue(inquiryData.weight, " kg")],
+    ["Primary goal", displayValue(inquiryData.fitnessGoal)],
+    ["Experience", displayValue(inquiryData.experienceLevel)],
+    ["Workout days", displayValue(inquiryData.workoutDaysPerWeek)],
+    ["Training location", displayValue(inquiryData.trainingLocation)],
+    ["Equipment", displayValue(inquiryData.equipment)],
+    ["Priority muscles", displayValue(inquiryData.priorityMuscles)],
+    ["Injuries or limitations", displayValue(inquiryData.injuries)],
+  ];
 
   return (
-    <>
-      <h1>Data Statistics</h1>
-      <p>Age range: {inquiryData.ageRange || "Not provided"}</p>
-    </>
+    <main className="profile-page">
+      <button type="button" className="profile-back-button" onClick={onBack}>
+        <Icon name="arrow-left" size={18} />
+        Back
+      </button>
+
+      <header className="profile-header">
+        <p className="card-eyebrow">Your account</p>
+        <h1>Profile</h1>
+        <p>Your answers from the fitness inquiry.</p>
+      </header>
+
+      <section className="profile-data-card" aria-label="Inquiry data">
+        {fields.map(([label, value]) => (
+          <div className="profile-data-row" key={label}>
+            <span>{label}</span>
+            <strong>{value}</strong>
+          </div>
+        ))}
+      </section>
+    </main>
   );
 }
 

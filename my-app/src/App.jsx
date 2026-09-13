@@ -8,6 +8,7 @@ import Inquiry from './Components/inquiry'
 import SignUp from "./Components/signUp"
 import Icon from "./Components/icon"
 import MobileNavbar from "./Components/mobileNavbar"
+import DataStats from "./Components/dataStats"
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { auth, db } from "./firebase.js";
 import { deleteField, doc, getDoc, setDoc } from "firebase/firestore";
@@ -174,6 +175,7 @@ function App() {
   const [openSignUp, setOpenSignUp] = useState(true);
   const [isGuestMode, setIsGuestMode] = useState(false);
   const [workoutsLoadedForUser, setWorkoutsLoadedForUser] = useState(null);
+  const [showProfile, setShowProfile] = useState(false);
 
   
   useEffect(() => {
@@ -352,6 +354,9 @@ if (openSignUp && !user) {
   return (
     <>
       {loading && <MainLoad fade={fade} />}
+      {showProfile ? (
+        <DataStats inquiryData={inquiryData} onBack={() => setShowProfile(false)} />
+      ) : (
       <div style={{ background: 'var(--bg-color)' }} className="container-fluid app-shell">
 
         {/* ── Header ── */}
@@ -656,8 +661,9 @@ if (openSignUp && !user) {
           </main>
         )}
       </div>
+      )}
 
-      {!isLoadingWorkout && <MobileNavbar />}
+      {!isLoadingWorkout && <MobileNavbar onProfileClick={() => setShowProfile(true)} />}
 
       {/* ── CreateWorkout overlay ── */}
       {isLoadingWorkout && (

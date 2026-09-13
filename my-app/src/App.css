@@ -295,6 +295,78 @@ option {
   display: none;
 }
 
+.profile-page {
+  min-height: 100vh;
+  padding: 28px 24px 112px;
+  background: var(--bg-color);
+}
+
+.profile-back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 32px;
+  padding: 8px 0;
+  color: #aab4c3;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-weight: 600;
+}
+
+.profile-header {
+  margin-bottom: 24px;
+}
+
+.profile-header h1 {
+  margin: 0 0 8px;
+  font-size: clamp(2.25rem, 9vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.profile-header > p:last-child {
+  margin: 0;
+  color: #8995a8;
+  font-size: 0.95rem;
+}
+
+.profile-data-card {
+  max-width: 680px;
+  padding: 8px 20px;
+  background: var(--card-bg);
+  border: 1px solid #2a2a2a;
+  border-radius: 20px;
+}
+
+.profile-data-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 16px 0;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.profile-data-row:last-child {
+  border-bottom: 0;
+}
+
+.profile-data-row span {
+  color: #8995a8;
+  font-size: 0.85rem;
+}
+
+.profile-data-row strong {
+  max-width: 58%;
+  color: #f5f7fb;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 767.98px) {
   .app-shell {
     padding-bottom: calc(92px + env(safe-area-inset-bottom));
@@ -328,6 +400,18 @@ option {
     color: #ffffff;
     background: transparent;
     pointer-events: none;
+  }
+
+  .mobile-navbar__item--interactive {
+    padding: 0;
+    border: 0;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+
+  .mobile-navbar__item--interactive:focus-visible {
+    outline: 2px solid #79aef2;
+    outline-offset: 3px;
   }
 
   .dashboard-status,
