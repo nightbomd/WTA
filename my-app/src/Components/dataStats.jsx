@@ -1,4 +1,5 @@
 import Icon from "./icon";
+import Button from "./btn";
 
 const displayValue = (value, suffix = "") => {
   if (Array.isArray(value)) return value.length ? value.join(", ") : "Not provided";
@@ -38,6 +39,7 @@ function DataStats({ inquiryData = {}, onBack }) {
           <div className="profile-data-row" key={label}>
             <span>{label}</span>
             <strong>{value}</strong>
+            <Button color="white" text="edit" onClick={() => handleEdit(label)} className="auto px-3" />
           </div>
         ))}
       </section>
