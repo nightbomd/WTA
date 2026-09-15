@@ -355,7 +355,7 @@ if (openSignUp && !user) {
     <>
       {loading && <MainLoad fade={fade} />}
       {showProfile ? (
-        <DataStats inquiryData={inquiryData} onBack={() => setShowProfile(false)} />
+        <DataStats inquiryData={inquiryData} setInquiryData={setInquiryData} onBack={() => setShowProfile(false)} />
       ) : (
       <div style={{ background: 'var(--bg-color)' }} className="container-fluid app-shell">
 
