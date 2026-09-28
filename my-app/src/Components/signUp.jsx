@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { auth } from "../firebase.js";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword} from "firebase/auth";
 
 export default function SignUp({ openSignUp, setOpenSignUp, setUser, onContinueWithoutAccount, onSignedIn }) {
     const [email, setEmail] = useState("");

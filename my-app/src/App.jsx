@@ -527,7 +527,7 @@ if (openSignUp && !user) {
 
               {/* Weekly Volume Card */}
               <div style={{ background: 'var(--card-bg)' }} className="card-workout col-sm-12 col-md-6 col-lg-6 rounded-5 shadow p-4">
-                <h2 className="text-light section-heading">Weekly Volume <span className="section-heading__detail">({inquiryData.workoutDaysPerWeek} days)</span></h2>
+                <h2 className="text-light section-heading">Today's Volume <span className="section-heading__detail">({inquiryData.workoutDaysPerWeek} days)</span></h2>
                 {displayWorkout?.exercises?.length > 0 ? (
                   <div className="exercise-table">
                     <table className="table table-dark table-borderless mb-0" style={{ background: 'transparent' }}>
@@ -562,7 +562,7 @@ if (openSignUp && !user) {
             {/* ── Calorie + Stats ── */}
             <div className="row g-4 px-4 pb-4">
               <div style={{ background: 'var(--card-bg)' }} className="col-sm-12 col-md-6 col-lg-6 calorie-tracker rounded-5 p-4">
-                <h2 className="text-light section-heading">Calorie Tracker</h2>
+                <h2 className="text-light section-heading">Progress for the month</h2>
                 <DonutComponent value={2120} bg="var(--color-blue)" />
                 <div className="protein">
                   <h3 className="text-light metric-heading">Protein: <strong>150g</strong></h3>
