@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { auth } from "../firebase.js";
-import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword} from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword} from "firebase/auth";
 
 export default function SignUp({ openSignUp, setOpenSignUp, setUser, onContinueWithoutAccount, onSignedIn }) {
     const [email, setEmail] = useState("");
@@ -19,6 +19,30 @@ export default function SignUp({ openSignUp, setOpenSignUp, setUser, onContinueW
             console.error(error);
         }
     };
+    const signUpEmailAndPassword = async () => {
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            // User signed up successfully
+            console.log(userCredential);
+            onSignedIn?.();
+            setUser(userCredential.user); // Update user state
+            setOpenSignUp(false); // Close the signup modal
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    const logInWithEmailAndPassword = async () => {
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            // User logged in successfully
+            console.log(userCredential);
+            onSignedIn?.();
+            setUser(userCredential.user); // Update user state
+            setOpenSignUp(false); // Close the signup modal
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     return (
         <main className="signup-page d-flex justify-content-center align-items-center ">
@@ -69,6 +93,7 @@ export default function SignUp({ openSignUp, setOpenSignUp, setUser, onContinueW
                         <button
                             type="button"
                             className="btn btn-outline-light flex-fill"
+                            onClick={signUpEmailAndPassword}
                         >
                             Log In
                         </button>
@@ -76,6 +101,7 @@ export default function SignUp({ openSignUp, setOpenSignUp, setUser, onContinueW
                         <button
                             type="button"
                             className="btn btn-light flex-fill"
+                            onClick={logInWithEmailAndPassword}
                         >
                             Sign Up
                         </button>
