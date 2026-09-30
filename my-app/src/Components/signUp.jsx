@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { auth } from "../firebase.js";
-import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword} from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 
 export default function SignUp({ openSignUp, setOpenSignUp, setUser, onContinueWithoutAccount, onSignedIn }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
     const handleGoogleSignUp = async () => {
         const provider = new GoogleAuthProvider();
@@ -29,18 +30,34 @@ export default function SignUp({ openSignUp, setOpenSignUp, setUser, onContinueW
             setOpenSignUp(false); // Close the signup modal
         } catch (error) {
             console.error(error);
+            setErrorMessage("Failed to sign up. Please check your credentials.");
         }
     };
     const logInWithEmailAndPassword = async () => {
         try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
             // User logged in successfully
             console.log(userCredential);
             onSignedIn?.();
             setUser(userCredential.user); // Update user state
             setOpenSignUp(false); // Close the signup modal
         } catch (error) {
-            console.error(error);
+            console.error(error.code);
+            switch (error.code) {
+                case "auth/invalid-email":
+                    setErrorMessage("Invalid email format.");
+
+                case "auth/invalid-credential":
+                case "auth/user-not-found":
+                case "auth/wrong-password":
+                    setErrorMessage(
+                        "Incorrect email or password. If you registered with Google, use the Google sign-in button."
+                    );
+                    break;
+
+                default:
+                    setErrorMessage("Failed to log in. Please check your credentials.");
+            }
         }
     }
 
@@ -77,15 +94,15 @@ export default function SignUp({ openSignUp, setOpenSignUp, setUser, onContinueW
                         className="btn btn-outline-light d-flex align-items-center w-100"
                         onClick={handleGoogleSignUp}
                     >
-                       <img src={`${import.meta.env.BASE_URL}google.png`} style={{height: "22px", width: "auto"}} className="img-fluid" alt="Google Logo" /> Sign Up with Google
+                        <img src={`${import.meta.env.BASE_URL}google.png`} style={{ height: "22px", width: "auto" }} className="img-fluid" alt="Google Logo" /> Sign Up with Google
                     </button>
-                  
-                      <button
+
+                    <button
                         type="button"
                         className="btn btn-outline-light  d-flex  align-items-center w-100"
                         onClick={handleGoogleSignUp}
                     >
-                        <img src={`${import.meta.env.BASE_URL}apple-logo.png`} style={{height: "30px", width: "auto"}} className="img-fluid" alt="Apple Logo" /> Sign Up with Apple
+                        <img src={`${import.meta.env.BASE_URL}apple-logo.png`} style={{ height: "30px", width: "auto" }} className="img-fluid" alt="Apple Logo" /> Sign Up with Apple
                     </button>
 
                     <div className="d-flex gap-2">
@@ -93,7 +110,7 @@ export default function SignUp({ openSignUp, setOpenSignUp, setUser, onContinueW
                         <button
                             type="button"
                             className="btn btn-outline-light flex-fill"
-                            onClick={signUpEmailAndPassword}
+                            onClick={logInWithEmailAndPassword}
                         >
                             Log In
                         </button>
@@ -101,21 +118,22 @@ export default function SignUp({ openSignUp, setOpenSignUp, setUser, onContinueW
                         <button
                             type="button"
                             className="btn btn-light flex-fill"
-                            onClick={logInWithEmailAndPassword}
+                            onClick={signUpEmailAndPassword}
                         >
                             Sign Up
                         </button>
-                      
+
                     </div>
-                     <button 
+                    <button
                         type="button"
                         onClick={() => {
                             onContinueWithoutAccount?.();
                             setOpenSignUp(false);
                         }}
-                     >
-                           Continue Without an Account
+                    >
+                        Continue Without an Account
                     </button>
+                    <p className="text-danger">{errorMessage}</p>
 
                 </form>
 

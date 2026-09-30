@@ -24,7 +24,7 @@ export default function MobileNavbar({ onProfileClick }) {
             </button>
           );
         }
-
+    
         return (
           <span
             key={item.label}
