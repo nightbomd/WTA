@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import ProgressBar from './Components/progressBar'
 import './App.css'
-import DonutComponent from './Components/donut'
 import Button from "./Components/btn"
 import CreateWorkout from './Components/createWorkout'
 import Inquiry from './Components/inquiry'
@@ -559,23 +558,13 @@ if (openSignUp && !user) {
               </div>
             </div>
 
-            {/* ── Calorie + Stats ── */}
+            {/* ── Muscle Progress + Stats ── */}
             <div className="row g-4 px-4 pb-4">
               <div style={{ background: 'var(--card-bg)' }} className="col-sm-12 col-md-6 col-lg-6 calorie-tracker rounded-5 p-4">
-                <h2 className="text-light section-heading">Progress for the month</h2>
-                <DonutComponent value={2120} bg="var(--color-blue)" />
-                <div className="protein">
-                  <h3 className="text-light metric-heading">Protein: <strong>150g</strong></h3>
-                  <ProgressBar text="72/150g" value={75} bg="var(--color-red)" />
-                </div>
-                <div className="carbs">
-                  <h3 className="text-light metric-heading">Carbs: <strong>200g</strong></h3>
-                  <ProgressBar text="150/200g" value={65} bg="var(--color-yellow)" />
-                </div>
-                <div className="carbs">
-                  <h3 className="text-light metric-heading">Fats: <strong>48g</strong></h3>
-                  <ProgressBar text="16/48g" value={32} bg="var(--color-green)" />
-                </div>
+                <h2 className="text-light section-heading">Muscle Progress</h2>
+                <p className="text-secondary mb-0">
+                  A graph will show how your weekly sets for each muscle group increase over time.
+                </p>
               </div>
               <div style={{ background: 'var(--card-bg)' }} className="col-sm-12 col-md-6 col-lg-6 rounded-5 p-4">
                 <h2 className="text-light section-heading">Stats</h2>
