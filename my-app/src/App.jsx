@@ -190,6 +190,7 @@ function App() {
   const [workoutsLoadedForUser, setWorkoutsLoadedForUser] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
   const [currentWeight, setCurrentWeight] = useState(inquiryData.weight || 0);
+  const workoutCounter = workoutLog.length;
 
   const handleHomeClick = () => {
     if (showProfile) {
@@ -625,7 +626,7 @@ if (openSignUp && !user) {
               <div className="col-12">
                 <div style={{ background: 'var(--card-bg)' }} className="rounded-5 p-4">
                   <div className="d-flex align-items-center justify-content-between mb-4">
-                    <h2 className="text-light section-heading mb-0">Workout History</h2>
+                    <h2 className="text-light section-heading mb-0">Workout History <span className="text-secondary">({workoutCounter})</span></h2>
                     <span className="history-count" style={{
                       fontSize: 12, fontWeight: 700, color: '#555',
                       background: '#1a1a1a', border: '1px solid #2a2a2a',
