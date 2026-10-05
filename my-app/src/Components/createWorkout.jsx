@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Select from './select'
 import Icon from './icon'
 import { db, auth } from "../firebase";
@@ -334,6 +334,7 @@ const StepReview = ({ data, exercises, isEditing }) => (
 // --- Main ---
 export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, onCancel }) {
   const isEditing = !!initialData;
+  const contentRef = useRef(null);
 
   const [step, setStep]           = useState(0);
   const [direction, setDirection] = useState(1);
@@ -341,6 +342,12 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
   const [workoutData, setWorkoutData] = useState({ name: "", type: "", muscles: [] });
   const [exercises, setExercises] = useState([]);
   const [draftLoaded, setDraftLoaded] = useState(false); // flag to prevent save before draft loads
+
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.scrollTop = 0;
+    }
+  }, [step]);
 
 
   // Load initialData (edit mode) OR draft (new mode)
@@ -474,8 +481,8 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
       </div>
 
       {/* Step Content */}
-      <div style={{
-        flex: 1, overflowY: "auto", padding: "20px 20px 0",
+      <div ref={contentRef} style={{
+        ...S.scrollContent,
         opacity: animating ? 0 : 1,
         transform: animating ? `translateX(${direction * 24}px)` : "translateX(0)",
         transition: animating ? "none" : "opacity 0.2s ease, transform 0.2s ease",
@@ -515,17 +522,30 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
 const S = {
   root: {
     display: "flex", flexDirection: "column",
-    height: "100vh", width: "100vw",
+    height: "100dvh", minHeight: "100svh", width: "100%",
     background: "#0f0f0f", color: "#f0f0f0",
     fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
     margin: 0, padding: 0, overflow: "hidden",
-    position: "fixed", top: 0, left: 0, zIndex: 999,
+    position: "fixed", inset: 0, zIndex: 999,
+    overscrollBehavior: "none",
   },
   header: {
-    padding: "52px 20px 16px",
+    padding: "calc(52px + env(safe-area-inset-top)) 20px 16px",
     background: "#0f0f0f",
     borderBottom: "1px solid #1a1a1a",
     flexShrink: 0,
+  },
+  scrollContent: {
+    flex: 1,
+    minHeight: 0,
+    width: "100%",
+    overflowX: "hidden",
+    overflowY: "auto",
+    padding: "20px 20px 24px",
+    boxSizing: "border-box",
+    overscrollBehaviorY: "contain",
+    WebkitOverflowScrolling: "touch",
+    touchAction: "pan-y",
   },
   title: { fontSize: 28, fontWeight: 800, margin: 0, letterSpacing: "-0.02em", color: "#fff" },
   label: { fontSize: 11, fontWeight: 700, color: "#666", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 10 },
@@ -556,7 +576,7 @@ const S = {
   statChip: { fontSize: 12, color: "#666", fontWeight: 600 },
   bottomNav: {
     display: "flex", justifyContent: "space-between", alignItems: "center",
-    padding: "16px 20px 32px", borderTop: "1px solid #1a1a1a",
+    padding: "16px 20px calc(32px + env(safe-area-inset-bottom))", borderTop: "1px solid #1a1a1a",
     background: "#0f0f0f", flexShrink: 0, gap: 12,
   },
   backBtn: {

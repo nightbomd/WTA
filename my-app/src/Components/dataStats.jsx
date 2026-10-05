@@ -1,108 +1,122 @@
+import { useState } from "react";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../firebase.js";
 import Icon from "./icon";
 import Button from "./btn";
-import { auth, db } from "../firebase.js";
-import {doc, setDoc } from "firebase/firestore";
 
 const displayValue = (value, suffix = "") => {
-  if (Array.isArray(value)) return value.length ? value.join(", ") : "Not provided";
+  if (Array.isArray(value)) {
+    return value.length ? value.join(", ") : "Not provided";
+  }
+
   return value ? `${value}${suffix}` : "Not provided";
 };
 
 function DataStats({ inquiryData = {}, setInquiryData, onBack }) {
-  const fields = [{
-    label: "Name",
-    key: "name",
-    value: displayValue(inquiryData.name),
-  },
-  {
-    label: "Age range",
-    key: "ageRange",
-    value: displayValue(inquiryData.ageRange),
-  },
-  {
-    label: "Height",
-    key: "height",
-    value: displayValue(inquiryData.height, " cm"),
-  },
-  {
-    label: "Weight",
-    key: "weight",
-    value: displayValue(inquiryData.weight, " kg"),
-  },
-  {
-    label: "Primary goal",
-    key: "fitnessGoal",
-    value: displayValue(inquiryData.fitnessGoal),
-  },
-  {
-    label: "Experience",
-    key: "experienceLevel",
-    value: displayValue(inquiryData.experienceLevel),
-  },
-  {
-    label: "Workout days",
-    key: "workoutDaysPerWeek",
-    value: displayValue(inquiryData.workoutDaysPerWeek),
-  },
-  {
-    label: "Training location",
-    key: "trainingLocation",
-    value: displayValue(inquiryData.trainingLocation),
-  },
-  {
-    label: "Equipment",
-    key: "equipment",
-    value: displayValue(inquiryData.equipment),
-  },
-  {
-    label: "Priority muscles",
-    key: "priorityMuscles",
-    value: displayValue(inquiryData.priorityMuscles),
-  },
-  {
-    label: "Injuries or limitations",
-    key: "injuries",
-    value: displayValue(inquiryData.injuries),
-  },
+  const [editValue, setEditValue] = useState("");
+  const [editingKey, setEditingKey] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+
+  const fields = [
+    {
+      label: "Name",
+      key: "name",
+      value: displayValue(inquiryData.name),
+    },
+    {
+      label: "Age range",
+      key: "ageRange",
+      value: displayValue(inquiryData.ageRange),
+    },
+    {
+      label: "Height",
+      key: "height",
+      value: displayValue(inquiryData.height, " cm"),
+    },
+    {
+      label: "Weight",
+      key: "weight",
+      value: displayValue(inquiryData.weight, " kg"),
+    },
+    {
+      label: "Primary goal",
+      key: "fitnessGoal",
+      value: displayValue(inquiryData.fitnessGoal),
+    },
+    {
+      label: "Experience",
+      key: "experienceLevel",
+      value: displayValue(inquiryData.experienceLevel),
+    },
+    {
+      label: "Workout days",
+      key: "workoutDaysPerWeek",
+      value: displayValue(inquiryData.workoutDaysPerWeek),
+    },
+    {
+      label: "Training location",
+      key: "trainingLocation",
+      value: displayValue(inquiryData.trainingLocation),
+    },
+    {
+      label: "Equipment",
+      key: "equipment",
+      value: displayValue(inquiryData.equipment),
+    },
+    {
+      label: "Priority muscles",
+      key: "priorityMuscles",
+      value: displayValue(inquiryData.priorityMuscles),
+    },
+    {
+      label: "Goal Deadline",
+      key: "goal",
+      value: displayValue(inquiryData.goal),
+    },
   ];
 
-  const handleEdit = async (index) => {
-    const field = fields[index];
+  const handleEdit = (field) => {
     const currentValue = inquiryData[field.key];
 
-    const promptValue = Array.isArray(currentValue)
-      ? currentValue.join(", ")
-      : currentValue ?? "";
-
-    const newValue = window.prompt(
-      `Enter your new ${field.label.toLowerCase()}:`,
-      promptValue
+    setEditValue(
+      Array.isArray(currentValue)
+        ? currentValue.join(", ")
+        : currentValue ?? ""
     );
 
-    // Don't change anything if Cancel was pressed.
-    if (newValue === null) return;
+    setEditingKey(field.key);
+    setSaveError("");
+  };
 
-    // Keep array fields as arrays.
-    const arrayFields = ["equipment", "priorityMuscles"];
+  const handleCancelEdit = () => {
+    setEditingKey(null);
+    setEditValue("");
+    setSaveError("");
+  };
 
-    const formattedValue = arrayFields.includes(field.key)
-      ? newValue
-        .split(",")
-        .map((item) => item.trim())
-        .filter(Boolean)
-      : newValue.trim();
+  const handleSaveEdit = async (field) => {
+    if (isSaving) return;
+
+    const currentValue = inquiryData[field.key];
+
+    const formattedValue = Array.isArray(currentValue)
+      ? editValue
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean)
+      : editValue.trim();
 
     const updatedInquiryData = {
       ...inquiryData,
       [field.key]: formattedValue,
     };
 
-    // Immediately update the information displayed in the app.
-    setInquiryData(updatedInquiryData);
-
     try {
+      setIsSaving(true);
+      setSaveError("");
+
       if (auth.currentUser) {
-        // Signed-in users: save to their Firebase document.
         await setDoc(
           doc(db, "users", auth.currentUser.uid),
           {
@@ -111,20 +125,30 @@ function DataStats({ inquiryData = {}, setInquiryData, onBack }) {
           { merge: true }
         );
       } else {
-        // Guests: save only on this device.
         localStorage.setItem(
           "inquiryData",
           JSON.stringify(updatedInquiryData)
         );
       }
+
+      setInquiryData(updatedInquiryData);
+      setEditingKey(null);
+      setEditValue("");
     } catch (error) {
       console.error("Failed to save inquiry changes:", error);
+      setSaveError("Your change could not be saved. Please try again.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
   return (
     <main className="profile-page">
-      <button type="button" className="profile-back-button" onClick={onBack}>
+      <button
+        type="button"
+        className="profile-back-button"
+        onClick={onBack}
+      >
         <Icon name="arrow-left" size={18} />
         Back
       </button>
@@ -135,14 +159,74 @@ function DataStats({ inquiryData = {}, setInquiryData, onBack }) {
         <p>Your answers from the fitness inquiry.</p>
       </header>
 
-      <section className="profile-data-card" aria-label="Inquiry data">
-        {fields.map((field, index) => (
+      <section
+        className="profile-data-card"
+        aria-label="Inquiry data"
+      >
+        {fields.map((field) => (
           <div className="profile-data-row" key={field.key}>
             <span>{field.label}</span>
-            <strong>{field.value}</strong>
-            <Button color="white" text="edit" onClick={() => handleEdit(index)} className="auto px-3" />
+
+            {editingKey === field.key ? (
+              <div className="profile-edit-controls">
+                <input
+                  type="text"
+                  aria-label={`Edit ${field.label}`}
+                  value={editValue}
+                  onChange={(event) =>
+                    setEditValue(event.target.value)
+                  }
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      handleSaveEdit(field);
+                    }
+
+                    if (event.key === "Escape") {
+                      handleCancelEdit();
+                    }
+                  }}
+                  disabled={isSaving}
+                  autoFocus
+                />
+
+                <button
+                  type="button"
+                  className="profile-edit-save"
+                  onClick={() => handleSaveEdit(field)}
+                  disabled={isSaving}
+                >
+                  {isSaving ? "Saving..." : "Save"}
+                </button>
+
+                <button
+                  type="button"
+                  className="profile-edit-cancel"
+                  onClick={handleCancelEdit}
+                  disabled={isSaving}
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <>
+                <strong>{field.value}</strong>
+
+                <Button
+                  color="white"
+                  text="Edit"
+                  onClick={() => handleEdit(field)}
+                />
+              </>
+            )}
           </div>
         ))}
+
+        {saveError && (
+          <p className="profile-save-error" role="alert">
+            {saveError}
+          </p>
+        )}
       </section>
     </main>
   );

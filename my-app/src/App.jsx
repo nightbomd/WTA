@@ -34,6 +34,19 @@ const formatDisplayDate = (dateStr) => {
     weekday: 'long', month: 'short', day: 'numeric'
   });
 };
+
+const calculateBMI = (weightKg, heightCm) => {
+  const weight = Number(weightKg);
+  const height = Number(heightCm);
+
+  if (!Number.isFinite(weight) || !Number.isFinite(height) || weight <= 0 || height <= 0) {
+    return null;
+  }
+
+  const heightInMeters = height / 100;
+  return (weight / (heightInMeters ** 2)).toFixed(1);
+};
+
 const weekdays = [
   "Monday",
   "Tuesday",
@@ -175,6 +188,7 @@ function App() {
   const [isGuestMode, setIsGuestMode] = useState(false);
   const [workoutsLoadedForUser, setWorkoutsLoadedForUser] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
+  const [currentWeight, setCurrentWeight] = useState(inquiryData.weight || 0);
 
   
   useEffect(() => {
@@ -561,7 +575,7 @@ if (openSignUp && !user) {
             {/* ── Muscle Progress + Stats ── */}
             <div className="row g-4 px-4 pb-4">
               <div style={{ background: 'var(--card-bg)' }} className="col-sm-12 col-md-6 col-lg-6 calorie-tracker rounded-5 p-4">
-                <h2 className="text-light section-heading">Muscle Progress</h2>
+                <h2 className="text-light section-heading">Weight Progress ({currentWeight}) kg</h2>
                 <p className="text-secondary mb-0">
                   A graph will show how your weekly sets for each muscle group increase over time.
                 </p>
@@ -570,21 +584,23 @@ if (openSignUp && !user) {
                 <h2 className="text-light section-heading">Stats</h2>
                 <div className="row justify-content-center g-3">
                   <div className="col-12 col-md-4">
-                    <div style={{ backgroundColor: '#332E2E' }} className="p-4 rounded-5 text-center h-100">
+                    <div style={{ backgroundColor: '#221f1fff' }} className="p-4 rounded-5 text-center h-100">
                       <p className="fs-1 fw-bold mb-1 stat-value" style={{ color: 'var(--color-blue)' }}>{inquiryData.weight || '—'}kg</p>
                       <span className="text-secondary d-block stat-label">Weight</span>
                     </div>
                   </div>
                   <div className="col-12 col-md-4">
-                    <div style={{ backgroundColor: '#332E2E' }} className="p-4 rounded-5 text-center h-100">
-                      <p className="fs-1 fw-bold mb-1 stat-value" style={{ color: 'var(--color-blue)' }}>15%</p>
-                      <span className="text-secondary d-block stat-label">Body Fat</span>
+                    <div style={{ backgroundColor: '#221f1fff' }} className="p-4 rounded-5 text-center h-100">
+                      <p className="fs-1 fw-bold mb-1 stat-value" style={{ color: 'var(--color-blue)' }}>
+                        {calculateBMI(inquiryData.weight, inquiryData.height) ?? '—'}
+                      </p>
+                      <span className="text-secondary d-block stat-label">BMI</span>
                     </div>
                   </div>
                   <div className="col-12 col-md-4">
-                    <div style={{ backgroundColor: '#332E2E' }} className="p-4 rounded-5 text-center h-100">
-                      <p className="fs-1 fw-bold mb-1 stat-value" style={{ color: 'var(--color-blue)' }}>Sep 1</p>
-                      <span className="text-secondary d-block stat-label">Deadline</span>
+                    <div style={{ backgroundColor: '#221f1fff' }} className="p-4 rounded-5 text-center h-100">
+                      <p className="fs-1 fw-bold mb-1 stat-value" style={{ color: 'var(--color-blue)' }}>{inquiryData.goal || '—'}</p>
+                      <span className="text-secondary d-block stat-label">Goal Deadline</span>
                     </div>
                   </div>
                 </div>

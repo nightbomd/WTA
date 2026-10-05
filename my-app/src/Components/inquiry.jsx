@@ -109,7 +109,7 @@ const formQuestion = [
   },
   {
     step: 9,
-    question: "Any injuries or limitations?",
+    question: "When do you plan to meet your goals by?",
     type: "textarea",
   },
 ];
@@ -162,7 +162,7 @@ export default function Inquiry({ setIsRegistering, setInquiryData }) {
       case 6: return "trainingLocation";
       case 7: return "equipment";
       case 8: return "priorityMuscles";
-      case 9: return "injuries";
+      case 9: return "goal";
       default: return "";
     }
   };
@@ -310,9 +310,9 @@ export default function Inquiry({ setIsRegistering, setInquiryData }) {
             <textarea
               className="form-control"
               rows="5"
-              placeholder="Describe any injuries or limitations..."
-              value={formData.injuries || ""}
-              onChange={(e) => handleChange("injuries", e.target.value)}
+              placeholder="Enter your target date or timeframe..."
+              value={formData.goal || ""}
+              onChange={(e) => handleChange("goal", e.target.value)}
             />
           )}
         </div>

@@ -341,10 +341,11 @@ option {
 }
 
 .profile-data-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 24px;
+  display: grid;
+  grid-template-columns: minmax(120px, 0.8fr) minmax(0, 1.2fr) auto;
+  grid-template-areas: "label value action";
+  align-items: center;
+  gap: 16px;
   padding: 16px 0;
   border-bottom: 1px solid #2a2a2a;
 }
@@ -354,20 +355,98 @@ option {
 }
 
 .profile-data-row span {
+  grid-area: label;
+  min-width: 0;
   color: #8995a8;
   font-size: 0.85rem;
 }
 
 .profile-data-row strong {
-  max-width: 58%;
+  grid-area: value;
+  min-width: 0;
   color: #f5f7fb;
   font-size: 0.9rem;
   line-height: 1.4;
-  text-align: right;
+  text-align: left;
   overflow-wrap: anywhere;
 }
 
+.profile-data-row > .btn {
+  grid-area: action;
+  justify-self: end;
+  min-width: 56px;
+}
+
+.profile-edit-controls {
+  grid-column: 2 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-edit-controls input {
+  min-width: 0;
+  width: 100%;
+  padding: 10px 12px;
+  color: #f5f7fb;
+  background: #161616;
+  border: 1px solid #3b82f6;
+  border-radius: 8px;
+  outline: none;
+}
+
+.profile-edit-controls button {
+  padding: 9px 12px;
+  color: #ffffff;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.profile-edit-save {
+  background: var(--color-blue);
+  border: 1px solid var(--color-blue);
+}
+
+.profile-edit-cancel {
+  background: transparent;
+  border: 1px solid #3a3a3a;
+}
+
+.profile-edit-controls button:disabled,
+.profile-edit-controls input:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.profile-save-error {
+  margin: 12px 0;
+  color: #f08a8a;
+  font-size: 0.85rem;
+}
+
 @media (max-width: 767.98px) {
+  .profile-data-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "label action"
+      "value action";
+    column-gap: 12px;
+    row-gap: 4px;
+  }
+
+  .profile-edit-controls {
+    grid-column: 1 / -1;
+    grid-template-columns: 1fr 1fr;
+    margin-top: 8px;
+  }
+
+  .profile-edit-controls input {
+    grid-column: 1 / -1;
+  }
+
   .app-shell {
     padding-bottom: calc(92px + env(safe-area-inset-bottom));
   }
