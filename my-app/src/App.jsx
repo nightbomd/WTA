@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import ProgressBar from './Components/progressBar'
 import './App.css'
 import Button from "./Components/btn"
@@ -173,6 +173,7 @@ const histStyles = {
 
 // --- Main App ---
 function App() {
+  const dashboardTopRef = useRef(null);
   const today = toLocalDateStr(new Date());
   console.log(today);
   const [workoutLog, setWorkoutLog] = useState([]);       // all saved workouts
@@ -189,6 +190,18 @@ function App() {
   const [workoutsLoadedForUser, setWorkoutsLoadedForUser] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
   const [currentWeight, setCurrentWeight] = useState(inquiryData.weight || 0);
+
+  const handleHomeClick = () => {
+    if (showProfile) {
+      setShowProfile(false);
+      return;
+    }
+
+    dashboardTopRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  };
 
   
   useEffect(() => {
@@ -370,7 +383,7 @@ if (openSignUp && !user) {
       {showProfile ? (
         <DataStats inquiryData={inquiryData} setInquiryData={setInquiryData} onBack={() => setShowProfile(false)} />
       ) : (
-      <div style={{ background: 'var(--bg-color)' }} className="container-fluid app-shell">
+      <div ref={dashboardTopRef} style={{ background: 'var(--bg-color)' }} className="container-fluid app-shell">
 
         {/* ── Header ── */}
         <div className="row g-4 p-4">
@@ -668,7 +681,12 @@ if (openSignUp && !user) {
       </div>
       )}
 
-      {!isLoadingWorkout && <MobileNavbar onProfileClick={() => setShowProfile(true)} />}
+      {!isLoadingWorkout && (
+        <MobileNavbar
+          onHomeClick={handleHomeClick}
+          onProfileClick={() => setShowProfile(true)}
+        />
+      )}
 
       {/* ── CreateWorkout overlay ── */}
       {isLoadingWorkout && (

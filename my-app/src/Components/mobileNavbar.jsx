@@ -7,18 +7,24 @@ const navItems = [
   { label: "Settings", icon: "nav-settings" },
 ];
 
-export default function MobileNavbar({ onProfileClick }) {
+export default function MobileNavbar({ onHomeClick, onProfileClick }) {
   return (
     <nav className="mobile-navbar" aria-label="Mobile navigation">
       {navItems.map((item) => {
-        if (item.label === "Profile") {
+        const clickHandler = item.label === "Home"
+          ? onHomeClick
+          : item.label === "Profile"
+            ? onProfileClick
+            : null;
+
+        if (clickHandler) {
           return (
             <button
               key={item.label}
               type="button"
               className="mobile-navbar__item mobile-navbar__item--interactive"
-              aria-label="Open profile"
-              onClick={onProfileClick}
+              aria-label={item.label === "Home" ? "Go to home" : "Open profile"}
+              onClick={clickHandler}
             >
               <Icon name={item.icon} size={31} />
             </button>
