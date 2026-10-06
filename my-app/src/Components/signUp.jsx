@@ -126,6 +126,7 @@ export default function SignUp({ openSignUp, setOpenSignUp, setUser, onContinueW
                     </div>
                     <button
                         type="button"
+                        className="btn btn-outline-light w-100"
                         onClick={() => {
                             onContinueWithoutAccount?.();
                             setOpenSignUp(false);
