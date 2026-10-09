@@ -189,7 +189,7 @@ function App() {
   const [isGuestMode, setIsGuestMode] = useState(false);
   const [workoutsLoadedForUser, setWorkoutsLoadedForUser] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
-  const [currentWeight, setCurrentWeight] = useState(inquiryData.weight || 0);
+  const currentWeight = Number(inquiryData.weight) || 0;
   const workoutCounter = workoutLog.length;
 
   const handleHomeClick = () => {
@@ -590,9 +590,10 @@ if (openSignUp && !user) {
             <div className="row g-4 px-4 pb-4">
               <div style={{ background: 'var(--card-bg)' }} className="col-sm-12 col-md-6 col-lg-6 calorie-tracker rounded-5 p-4">
                 <h2 className="text-light section-heading">Weight Progress ({currentWeight}) kg</h2>
-                <p className="text-secondary mb-0">
+                <p className="text-secondary mb-3">
                   A graph will show how your weekly sets for each muscle group increase over time.
                 </p>
+                <Button text="Log Weight" onClick={() => {}} />
               </div>
               <div style={{ background: 'var(--card-bg)' }} className="col-sm-12 col-md-6 col-lg-6 rounded-5 p-4">
                 <h2 className="text-light section-heading">Stats</h2>
