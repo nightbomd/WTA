@@ -27,6 +27,29 @@ const searchQuery = [
   { muscle: "Core",       keywords: ["Plank", "Crunch", "Cable Crunch", "Hanging Leg Raise", "Ab Wheel", "Russian Twist", "Decline Sit-Up", "Pallof Press"] },
   { muscle: "Calves",     keywords: ["Standing Calf Raise", "Seated Calf Raise", "Leg Press Calf Raise", "Single Leg Calf Raise", "Donkey Calf Raise"] },
 ];
+const options = [
+  {
+    key: "push",
+    exercises: ["Bench Press", "Push-Up", "Chest Fly", "Cable Crossover", "Incline DB Press", "Machine Press", "Smith Machine Press", "Decline Press", "Pec Deck"]
+  },
+  {
+    key: "pull",
+    exercises: ["Wide-Grip-Pull up", "Pull-Up", "Barbell Row", "Lat Pulldown", "Seated Cable Row", "T-Bar Row", "Single Arm DB Row", "Face Pull", "Deadlift"]
+  },
+  {
+    key: "legs",
+    exercises: ["Squat", "Leg Press", "Hack Squat", "Leg Extension", "Bulgarian Split Squat", "Lunge", "Front Squat", "Goblet Squat", "Kettlebell Swing"]
+  },
+  {
+    key: "upper",
+    exercises: ["Bench Press", "Overhead Press", "Pull-Up", "Bent Over Row", "Face Pull", "Lateral Raise", "Front Raise", "Bicep Curl", "Tricep Extension", "Wide-Grip-Pull up", "Pull-Up", "Barbell Row", "Lat Pulldown", "Seated Cable Row", "T-Bar Row", "Single Arm DB Row", "Face Pull", "Deadlift"]
+  },
+  {
+    key: "full-body",
+    exercises: ["Bench Press", "Deadlift", "Squat", "Pull-Up", "Overhead Press", "Barbell Row", "Lateral Raise", "Front Raise", "Bicep Curl", "Tricep Extension", "Wide-Grip-Pull up", "Pull-Up", "Barbell Row", "Lat Pulldown", "Seated Cable Row", "T-Bar Row", "Single Arm DB Row", "Face Pull", "Deadlift", "Squat", "Leg Press", "Hack Squat", "Leg Extension", "Bulgarian Split Squat", "Lunge", "Front Squat", "Goblet Squat", "Kettlebell Swing"]
+  }
+  
+]
 
 // Flatten into {name, muscle} for quick lookup
 const ALL_EXERCISES = searchQuery.flatMap(({ muscle, keywords }) =>
