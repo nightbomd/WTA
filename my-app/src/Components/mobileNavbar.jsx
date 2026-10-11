@@ -7,15 +7,17 @@ const navItems = [
   { label: "Settings", icon: "nav-settings" },
 ];
 
-export default function MobileNavbar({ onHomeClick, onProfileClick }) {
+export default function MobileNavbar({ onHomeClick, onProfileClick, onStatsClick }) {
   return (
     <nav className="mobile-navbar" aria-label="Mobile navigation">
       {navItems.map((item) => {
-        const clickHandler = item.label === "Home"
-          ? onHomeClick
-          : item.label === "Profile"
-            ? onProfileClick
-            : null;
+        const handler = {
+          Home: onHomeClick,
+          Stats: onStatsClick,
+          Profile: onProfileClick,
+        };
+
+        const clickHandler = handler[item.label] || null;
 
         if (clickHandler) {
           return (

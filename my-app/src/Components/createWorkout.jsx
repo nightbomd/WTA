@@ -10,22 +10,23 @@ const MUSCLE_TAGS = ["Chest", "Back", "Shoulders", "Biceps", "Triceps", "Quads",
 const STEP_COUNT = 3;
 const STEPS = [
   { label: "Name & Type", progress: 33 },
-  { label: "Exercises",   progress: 66 },
-  { label: "Review",      progress: 100 },
+  { label: "Exercises", progress: 66 },
+  { label: "Review", progress: 100 },
 ];
 
 // --- Exercise Search Data ---
 const searchQuery = [
-  { muscle: "Chest",      keywords: ["Bench Press", "Push-Up", "Chest Fly", "Cable Crossover", "Incline DB Press", "Machine Press", "Smith Machine Press", "Decline Press", "Pec Deck"] },
-  { muscle: "Back",       keywords: [ "Wide-Grip-Pull up", "Pull-Up", "Barbell Row", "Lat Pulldown", "Seated Cable Row", "T-Bar Row", "Single Arm DB Row", "Face Pull", "Deadlift"] },
-  { muscle: "Shoulders",  keywords: ["Overhead Press", "Lateral Raise", "Front Raise", "Arnold Press", "Upright Row", "Cable Lateral Raise", "Rear Delt Fly", "DB Shoulder Press"] },
-  { muscle: "Biceps",     keywords: ["Barbell Curl", "DB Curl", "Hammer Curl", "Preacher Curl", "Cable Curl", "Concentration Curl", "Incline DB Curl", "Spider Curl"] },
-  { muscle: "Triceps",    keywords: ["Tricep Dip", "Skull Crusher", "Overhead Tricep Extension", "Cable Pushdown", "Close Grip Bench", "Diamond Push-Up", "Kickback"] },
-  { muscle: "Quads",      keywords: ["Squat", "Leg Press", "Hack Squat", "Leg Extension", "Bulgarian Split Squat", "Lunge", "Front Squat", "Goblet Squat", "Kettlebell Swing"] },
+  { muscle: "Chest", keywords: ["Bench Press", "Push-Up", "Chest Fly", "Cable Crossover", "Incline DB Press", "Machine Press", "Smith Machine Press", "Decline Press", "Pec Deck"] },
+  { muscle: "Back", keywords: ["Wide-Grip-Pull up", "Pull-Up", "Barbell Row", "Lat Pulldown", "Seated Cable Row", "T-Bar Row", "Single Arm DB Row", "Face Pull", "Deadlift"] },
+  { muscle: "Shoulders", keywords: ["Overhead Press", "Lateral Raise", "Front Raise", "Arnold Press", "Upright Row", "Cable Lateral Raise", "Rear Delt Fly", "DB Shoulder Press"] },
+  { muscle: "Biceps", keywords: ["Barbell Curl", "DB Curl", "Hammer Curl", "Preacher Curl", "Cable Curl", "Concentration Curl", "Incline DB Curl", "Spider Curl"] },
+  { muscle: "Triceps", keywords: ["Tricep Dip", "Skull Crusher", "Overhead Tricep Extension", "Cable Pushdown", "Close Grip Bench", "Diamond Push-Up", "Kickback"] },
+  { muscle: "Quads", keywords: ["Squat", "Leg Press", "Hack Squat", "Leg Extension", "Bulgarian Split Squat", "Lunge", "Front Squat", "Goblet Squat", "Kettlebell Swing"] },
   { muscle: "Hamstrings", keywords: ["Romanian Deadlift", "Leg Curl", "Nordic Curl", "Good Morning", "Stiff Leg Deadlift", "Glute Ham Raise", "Sumo Deadlift"] },
-  { muscle: "Glutes",     keywords: ["Hip Thrust", "Glute Bridge", "Cable Kickback", "Step Up", "Sumo Squat", "Donkey Kick", "Abductor Machine"] },
-  { muscle: "Core",       keywords: ["Plank", "Crunch", "Cable Crunch", "Hanging Leg Raise", "Ab Wheel", "Russian Twist", "Decline Sit-Up", "Pallof Press"] },
-  { muscle: "Calves",     keywords: ["Standing Calf Raise", "Seated Calf Raise", "Leg Press Calf Raise", "Single Leg Calf Raise", "Donkey Calf Raise"] },
+  { muscle: "Glutes", keywords: ["Hip Thrust", "Glute Bridge", "Cable Kickback", "Step Up", "Sumo Squat", "Donkey Kick", "Abductor Machine"] },
+  { muscle: "Core", keywords: ["Plank", "Crunch", "Cable Crunch", "Hanging Leg Raise", "Ab Wheel", "Russian Twist", "Decline Sit-Up", "Pallof Press"] },
+  { muscle: "Calves", keywords: ["Standing Calf Raise", "Seated Calf Raise", "Leg Press Calf Raise", "Single Leg Calf Raise", "Donkey Calf Raise"] },
+  { muscle: "Cardio", keywords: ["Running", "Cycling", "Rowing", "Stair Climber", "Elliptical", "Jump Rope", "Burpees"] },
 ];
 
 const WORKOUT_TYPE_MUSCLES = {
@@ -35,7 +36,8 @@ const WORKOUT_TYPE_MUSCLES = {
   Upper: ["Chest", "Back", "Shoulders", "Biceps", "Triceps"],
   Lower: ["Quads", "Hamstrings", "Glutes", "Calves"],
   "Full Body": MUSCLE_TAGS,
-  Custom: MUSCLE_TAGS,
+  Cardio: ["Cardio"],
+  Custom: [...MUSCLE_TAGS, "Cardio"],
 };
 
 // Flatten into {name, muscle} for quick lookup
@@ -44,19 +46,20 @@ const ALL_EXERCISES = searchQuery.flatMap(({ muscle, keywords }) =>
 );
 
 const MUSCLE_BADGE_COLORS = {
-  Chest:      { bg: "rgba(239,68,68,.12)",    color: "#ef4444" },
-  Back:       { bg: "rgba(59,130,246,.12)",   color: "#3b82f6" },
-  Shoulders:  { bg: "rgba(249,115,22,.12)",   color: "#f97316" },
-  Biceps:     { bg: "rgba(168,85,247,.12)",   color: "#a855f7" },
-  Triceps:    { bg: "rgba(236,72,153,.12)",   color: "#ec4899" },
-  Quads:      { bg: "rgba(234,179,8,.12)",    color: "#eab308" },
-  Hamstrings: { bg: "rgba(34,197,94,.12)",    color: "#22c55e" },
-  Glutes:     { bg: "rgba(20,184,166,.12)",   color: "#14b8a6" },
-  Core:       { bg: "rgba(148,163,184,.12)",  color: "#94a3b8" },
-  Calves:     { bg: "rgba(251,191,36,.12)",   color: "#fbbf24" },
+  Chest: { bg: "rgba(239,68,68,.12)", color: "#ef4444" },
+  Back: { bg: "rgba(59,130,246,.12)", color: "#3b82f6" },
+  Shoulders: { bg: "rgba(249,115,22,.12)", color: "#f97316" },
+  Biceps: { bg: "rgba(168,85,247,.12)", color: "#a855f7" },
+  Triceps: { bg: "rgba(236,72,153,.12)", color: "#ec4899" },
+  Quads: { bg: "rgba(234,179,8,.12)", color: "#eab308" },
+  Hamstrings: { bg: "rgba(34,197,94,.12)", color: "#22c55e" },
+  Glutes: { bg: "rgba(20,184,166,.12)", color: "#14b8a6" },
+  Core: { bg: "rgba(148,163,184,.12)", color: "#94a3b8" },
+  Calves: { bg: "rgba(251,191,36,.12)", color: "#fbbf24" },
+  Cardio: { bg: "rgba(14,165,233,.12)", color: "#38bdf8" },
 };
 
- const weekDays = {
+const weekDays = {
   monday: { label: "Monday", value: "monday" },
   tuesday: { label: "Tuesday", value: "tuesday" },
   wednesday: { label: "Wednesday", value: "wednesday" },
@@ -91,54 +94,55 @@ const StepNameType = ({ data, onChange }) => {
         <Select
           options={[
             { value: "", label: "Day" },
-          { value: "monday", label: "Monday " },
-          { value: "tuesday", label: "Tuesday " },
-          { value: "wednesday", label: "Wednesday " },
-          { value: "thursday", label: "Thursday " },
-          { value: "friday", label: "Friday " },
-          { value: "saturday", label: "Saturday " },
-          { value: "sunday", label: "Sunday " },
-        ]}
-        value={data.day}
-        onChange={value => {
-          setSelectedDay(value);
-          onChange({ ...data, day: value });
-        }}
-        style={{ ...S.select }}
-      />
-      <label style={S.label}>Workout Name</label>
-      <input
-        type="text" placeholder="e.g. Monday Push Day"
-        value={data.name}
-        onChange={e => onChange({ ...data, name: e.target.value })}
-        style={S.input} autoFocus
-      />
-    </div>
-    <div>
-      <label style={S.label}>Type</label>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
-        {WORKOUT_TYPES.map(t => (
-          <Chip key={t} label={t} selected={data.type === t} onClick={() => onChange({ ...data, type: t })} />
-        ))}
+            { value: "monday", label: "Monday " },
+            { value: "tuesday", label: "Tuesday " },
+            { value: "wednesday", label: "Wednesday " },
+            { value: "thursday", label: "Thursday " },
+            { value: "friday", label: "Friday " },
+            { value: "saturday", label: "Saturday " },
+            { value: "sunday", label: "Sunday " },
+          ]}
+          value={data.day}
+          onChange={value => {
+            setSelectedDay(value);
+            onChange({ ...data, day: value });
+          }}
+          style={{ ...S.select }}
+        />
+        <label style={S.label}>Workout Name</label>
+        <input
+          type="text" placeholder="e.g. Monday Push Day"
+          value={data.name}
+          onChange={e => onChange({ ...data, name: e.target.value })}
+          style={S.input} autoFocus
+        />
+      </div>
+      <div>
+        <label style={S.label}>Type</label>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
+          {WORKOUT_TYPES.map(t => (
+            <Chip key={t} label={t} selected={data.type === t} onClick={() => onChange({ ...data, type: t })} />
+          ))}
+        </div>
+      </div>
+      <div>
+        <label style={S.label}>Target Muscles</label>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
+          {MUSCLE_TAGS.map(m => (
+            <Chip key={m} label={m} selected={data.muscles.includes(m)}
+              onClick={() => {
+                const next = data.muscles.includes(m)
+                  ? data.muscles.filter(x => x !== m)
+                  : [...data.muscles, m];
+                onChange({ ...data, muscles: next });
+              }}
+            />
+          ))}
+        </div>
       </div>
     </div>
-    <div>
-      <label style={S.label}>Target Muscles</label>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
-        {MUSCLE_TAGS.map(m => (
-          <Chip key={m} label={m} selected={data.muscles.includes(m)}
-            onClick={() => {
-              const next = data.muscles.includes(m)
-                ? data.muscles.filter(x => x !== m)
-                : [...data.muscles, m];
-              onChange({ ...data, muscles: next });
-            }}
-          />
-        ))}
-      </div>
-    </div>
-  </div>
-);}
+  );
+}
 
 // --- Exercise Card ---
 const ExerciseCard = ({ exercise, onUpdate, onRemove }) => {
@@ -190,28 +194,59 @@ const ExerciseCard = ({ exercise, onUpdate, onRemove }) => {
 };
 
 // --- Step 2: Exercises ---
-const StepExercises = ({ exercises, onUpdate, workoutType}) => {
+const StepExercises = ({ exercises, onUpdate, workoutType }) => {
   const [query, setQuery] = useState("");
   const [showAdd, setShowAdd] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [highlightIdx, setHighlightIdx] = useState(-1);
-
-  const getSuggestions = (val) => {
-    if (!val.trim()) return [];
-    const q = val.toLowerCase();
-    return ALL_EXERCISES.filter(ex => ex.name.toLowerCase().includes(q)).slice(0, 6);
-  };
-
+  const pickerRef = useRef(null);
   const allowedMuscles = WORKOUT_TYPE_MUSCLES[workoutType] || MUSCLE_TAGS;
-
-  const availableExercises = ALL_EXERCISES.filter(ex => {
+  const availableExercises = ALL_EXERCISES.filter(ex =>
     allowedMuscles.includes(ex.muscle)
-  });
+  );
+
+  useEffect(() => {
+    if (!showAdd) return undefined;
+
+    const handleClickOutside = (event) => {
+      if (pickerRef.current && !pickerRef.current.contains(event.target)) {
+        setShowAdd(false);
+        setQuery("");
+        setSuggestions([]);
+        setHighlightIdx(-1);
+      }
+    };
+
+    document.addEventListener("pointerdown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("pointerdown", handleClickOutside);
+    };
+  }, [showAdd]);
+
+  const getSuggestions = (val = "") => {
+    const searchValue = val.toLowerCase().trim();
+
+    return availableExercises.filter(ex => {
+      return (
+        !searchValue ||
+        ex.name.toLowerCase().includes(searchValue)
+      );
+    });
+
+  };
 
   const handleQueryChange = (val) => {
     setQuery(val);
     setHighlightIdx(-1);
     setSuggestions(getSuggestions(val));
+  };
+
+  const handleOpenAdd = () => {
+    setQuery("");
+    setHighlightIdx(-1);
+    setSuggestions(getSuggestions(""));
+    setShowAdd(true);
   };
 
   const commitExercise = (name) => {
@@ -251,7 +286,7 @@ const StepExercises = ({ exercises, onUpdate, workoutType}) => {
         />
       ))}
       {showAdd ? (
-        <div style={{ position: "relative" }}>
+        <div ref={pickerRef} style={{ position: "relative" }}>
           <div style={{ display: "flex", gap: 8 }}>
             <input
               type="text" placeholder="Search exercises..."
@@ -269,7 +304,7 @@ const StepExercises = ({ exercises, onUpdate, workoutType}) => {
               position: "absolute", top: "calc(100% + 6px)", left: 0,
               right: 0, background: "#1a1a1a",
               border: "1.5px solid #2a2a2a", borderRadius: 12,
-              overflow: "hidden", zIndex: 50,
+              maxHeight: 280, overflowX: "hidden", overflowY: "auto", zIndex: 50,
               boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
             }}>
               {suggestions.map((ex, i) => {
@@ -304,7 +339,7 @@ const StepExercises = ({ exercises, onUpdate, workoutType}) => {
           )}
         </div>
       ) : (
-        <button onClick={() => setShowAdd(true)} style={S.addExerciseBtn}>+ Add Exercise</button>
+        <button onClick={handleOpenAdd} style={S.addExerciseBtn}>+ Add Exercise</button>
       )}
     </div>
   );
@@ -335,7 +370,7 @@ const StepReview = ({ data, exercises, isEditing }) => (
           <div style={{ display: "flex", gap: 12 }}>
             {ex.sets && <span style={S.statChip}>{ex.sets} sets</span>}
             {ex.reps && <span style={S.statChip}>{ex.reps} reps</span>}
-            {ex.weight && <span style={{ ...S.statChip, color:  "#3b82f6" }}>{ex.weight} lbs</span>}
+            {ex.weight && <span style={{ ...S.statChip, color: "#3b82f6" }}>{ex.weight} lbs</span>}
           </div>
         </div>
         {ex.notes && <div style={{ fontSize: 12, color: "#555", marginTop: 6 }}>{ex.notes}</div>}
@@ -352,7 +387,7 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
   const isEditing = !!initialData;
   const contentRef = useRef(null);
 
-  const [step, setStep]           = useState(0);
+  const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
   const [animating, setAnimating] = useState(false);
   const [workoutData, setWorkoutData] = useState({ name: "", type: "", muscles: [] });
@@ -399,26 +434,26 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
 
   // Auto-save draft only in create mode (and only after initial load)
   useEffect(() => {
-  if (!isEditing && draftLoaded && auth.currentUser) {
-    const saveDraft = async () => {
-      try {
-        const draft = { workoutData, exercises };
+    if (!isEditing && draftLoaded && auth.currentUser) {
+      const saveDraft = async () => {
+        try {
+          const draft = { workoutData, exercises };
 
-        await setDoc(
-          doc(db, "users", auth.currentUser.uid),
-          {
-            workoutDraft: draft,
-          },
-          { merge: true } // prevents overwriting other user data
-        );
-      } catch (error) {
-        console.error("Failed to save workout draft:", error);
-      }
-    };
+          await setDoc(
+            doc(db, "users", auth.currentUser.uid),
+            {
+              workoutDraft: draft,
+            },
+            { merge: true } // prevents overwriting other user data
+          );
+        } catch (error) {
+          console.error("Failed to save workout draft:", error);
+        }
+      };
 
-    saveDraft();
-  }
-}, [workoutData, exercises, isEditing, draftLoaded]);
+      saveDraft();
+    }
+  }, [workoutData, exercises, isEditing, draftLoaded]);
 
   const canNext = () => {
     if (step === 0) return workoutData.name.trim().length > 0 && workoutData.type;
@@ -504,7 +539,13 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
         transition: animating ? "none" : "opacity 0.2s ease, transform 0.2s ease",
       }}>
         {step === 0 && <StepNameType data={workoutData} onChange={setWorkoutData} />}
-        {step === 1 && <StepExercises exercises={exercises} onUpdate={setExercises} />}
+        {step === 1 && (
+          <StepExercises
+            exercises={exercises}
+            onUpdate={setExercises}
+            workoutType={workoutData.type}
+          />
+        )}
         {step === 2 && <StepReview data={workoutData} exercises={exercises} isEditing={isEditing} />}
       </div>
 
@@ -608,5 +649,5 @@ const S = {
     flex: 1, padding: "15px 28px", border: "none", borderRadius: 12,
     color: "#fff", fontSize: 15, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", letterSpacing: "-0.01em",
   },
- 
+
 };

@@ -12,11 +12,6 @@ import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { auth, db } from "./firebase.js";
 import { deleteField, doc, getDoc, setDoc } from "firebase/firestore";
 
-
-
-
-
-
 // --- Helpers ---
 // Returns YYYY-MM-DD in LOCAL time (not UTC)
 const toLocalDateStr = (date) => {
@@ -189,6 +184,9 @@ function App() {
   const [isGuestMode, setIsGuestMode] = useState(false);
   const [workoutsLoadedForUser, setWorkoutsLoadedForUser] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
+  const statsSectionRef = useRef(null);
+  const [shoulderScrollStat, setShouldScrollStat] = useState(false);
+  
   const currentWeight = Number(inquiryData.weight) || 0;
   const workoutCounter = workoutLog.length;
 
@@ -203,6 +201,26 @@ function App() {
       block: 'start',
     });
   };
+const handleStatsClick = () => {
+  if (showProfile) {
+    setShouldScrollStat(true);
+    setShowProfile(false);
+    return;
+  }
+
+  statsSectionRef.current?.scrollIntoView({
+    behavior: "smooth",
+    block: "center",
+  });
+};
+  useEffect(() => {
+    if (!showProfile && shoulderScrollStat) {
+      statsSectionRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  }, [showProfile, shoulderScrollStat]);
 
   
   useEffect(() => {
@@ -481,8 +499,8 @@ if (openSignUp && !user) {
 
               {/* Today's Workout Card */}
               <div style={{ background: 'var(--card-bg)' }} className="card-workout col-sm-12 col-md-6 col-lg-6 rounded-5 shadow p-4">
-                <p className="card-eyebrow card-eyebrow--workout">
-                  {isToday ? "Today's workout" : formatDisplayDate(selectedDate)}
+                <p className=" section-heading">
+                  {isToday ? "Today's workout:" : formatDisplayDate(selectedDate)}
                 </p>
 
                 {displayWorkout ? (
@@ -588,7 +606,7 @@ if (openSignUp && !user) {
 
             {/* ── Muscle Progress + Stats ── */}
             <div className="row g-4 px-4 pb-4">
-              <div style={{ background: 'var(--card-bg)' }} className="col-sm-12 col-md-6 col-lg-6 calorie-tracker rounded-5 p-4">
+              <div ref={statsSectionRef} style={{ background: 'var(--card-bg)' }} className="col-sm-12 col-md-6 col-lg-6 calorie-tracker rounded-5 p-4">
                 <h2 className="text-light section-heading">Weight Progress ({currentWeight}) kg</h2>
                 <p className="text-secondary mb-3">
                   A graph will show how your weekly sets for each muscle group increase over time.
@@ -687,6 +705,7 @@ if (openSignUp && !user) {
         <MobileNavbar
           onHomeClick={handleHomeClick}
           onProfileClick={() => setShowProfile(true)}
+          onStatsClick={handleStatsClick}
         />
       )}
 
