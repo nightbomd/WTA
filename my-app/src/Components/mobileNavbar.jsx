@@ -7,7 +7,7 @@ const navItems = [
   { label: "Settings", icon: "nav-settings" },
 ];
 
-export default function MobileNavbar({ onHomeClick, onProfileClick, onStatsClick }) {
+export default function MobileNavbar({ onHomeClick, onProfileClick, onStatsClick, onSettingsClick }) {
   return (
     <nav className="mobile-navbar" aria-label="Mobile navigation">
       {navItems.map((item) => {
@@ -15,6 +15,7 @@ export default function MobileNavbar({ onHomeClick, onProfileClick, onStatsClick
           Home: onHomeClick,
           Stats: onStatsClick,
           Profile: onProfileClick,
+          Settings: onSettingsClick
         };
 
         const clickHandler = handler[item.label] || null;
@@ -25,7 +26,7 @@ export default function MobileNavbar({ onHomeClick, onProfileClick, onStatsClick
               key={item.label}
               type="button"
               className="mobile-navbar__item mobile-navbar__item--interactive"
-              aria-label={item.label === "Home" ? "Go to home" : "Open profile"}
+              aria-label={item.label === "Home" ? "Go to home" : `Open ${item.label.toLowerCase()}`}
               onClick={clickHandler}
             >
               <Icon name={item.icon} size={31} />

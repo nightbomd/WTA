@@ -1,8 +1,36 @@
-export default function Settings() {
+import Icon from "./icon";
+import Button from "./btn";
+
+
+
+
+export default function Settings({ onBack, onSignOut, user }) {
     return (
-        <div>
-            <h2 className="text-light section-heading">Settings</h2>
-            {/* Settings content goes here */}
-        </div>
+        <main className="profile-page">
+            <button
+                type="button"
+                className="profile-back-button"
+                onClick={onBack}
+            >
+                <Icon name="arrow-left" size={18} />
+                Back
+            </button>
+            <header className="profile-header">
+                <p className="card-eyebrow">Your account</p>
+                <h1>Settings</h1>
+               
+            </header>
+
+            <section
+                className="profile-data-card p-3"
+                aria-label="Inquiry data"
+            >
+                <h2>
+                    Account:
+                </h2>
+                <p> Signed in as {user?.email || "Guest"}</p>
+                <Button onClick={onSignOut} className="col-6" text="Sign Out"></Button>
+            </section>
+        </main>
     );
 }
