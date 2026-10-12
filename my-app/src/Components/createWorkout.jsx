@@ -88,6 +88,46 @@ const Chip = ({ label, selected, onClick }) => (
 // --- Step 1: Name & Type ---
 const StepNameType = ({ data, onChange }) => {
   const [selectedDay, setSelectedDay] = useState("");
+
+
+  const handlePresetMuscleTags = (type) => {
+    let presetMuscleTags;
+    switch (type) {
+      case "Push":
+        presetMuscleTags = ["Chest", "Shoulders", "Triceps"];
+        break;
+
+      case "Pull":
+        presetMuscleTags = ["Back", "Biceps"];
+        break;
+
+      case "Legs":
+        presetMuscleTags = ["Glutes", "Calves", "Hamstrings", "Quads"];
+        break;
+
+      case "Full Body":
+        presetMuscleTags = ["Chest", "Back", "Shoulders", "Biceps", "Triceps", "Quads", "Hamstrings", "Glutes", "Calves", "Core"];
+        break;
+
+      case "Cardio":
+        presetMuscleTags = [];
+        break;
+
+      case "Lower":
+        presetMuscleTags = ["Quads", "Hamstrings", "Glutes", "Calves"];
+        break;
+      case "Upper":
+        presetMuscleTags = ["Chest", "Back", "Shoulders", "Biceps", "Triceps"];
+        break;
+      case "Custom":
+      default:
+        // Keep whatever the user manually selected.
+        presetMuscleTags = data.muscles;
+        break;
+    }
+    onChange({ ...data, type, muscles: presetMuscleTags });
+  }
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
       <div style={{ width: "100%" }}>
@@ -121,7 +161,7 @@ const StepNameType = ({ data, onChange }) => {
         <label style={S.label}>Type</label>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
           {WORKOUT_TYPES.map(t => (
-            <Chip key={t} label={t} selected={data.type === t} onClick={() => onChange({ ...data, type: t })} />
+            <Chip key={t} label={t} selected={data.type === t} onClick={() => handlePresetMuscleTags(t)} />
           ))}
         </div>
       </div>
