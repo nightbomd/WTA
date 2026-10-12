@@ -443,9 +443,7 @@ function App() {
                       onClick={() => { setEditingWorkout(null); setIsLoadingWorkout(true); }}
                       className="mb-2"
                     />
-                    {user && (
-                      <Button text="Sign Out" bg="#282f36ff" onClick={handleSignOut} />
-                    )}
+                    
                     {!user && (
                       <>
                         <div className="d-flex flex-row"><p className="fs-5 text-secondary mb-2 account-warning"><span className="warning-icon"><Icon name="alert" size={20} /></span>Current workouts are not saved. Create an account to save workouts.</p></div>
