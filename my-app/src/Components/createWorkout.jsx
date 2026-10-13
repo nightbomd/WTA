@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import Select from './select'
 import Icon from './icon'
+import Button from './btn'
 import { db, auth } from "../firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore"
 
@@ -529,11 +530,13 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
             }
           </h1>
           {onCancel && (
-            <button onClick={onCancel} style={{
-              background: "none", border: "1px solid #2a2a2a", borderRadius: 8,
-              color: "#666", fontSize: 13, fontWeight: 700, padding: "6px 14px",
-              cursor: "pointer", fontFamily: "inherit",
-            }}>Cancel</button>
+            <Button
+              text="Cancel"
+              onClick={onCancel}
+              bg="#1c1c1c"
+              color="#ef4444"
+              border="1px solid #4a2626"
+            />
           )}
         </div>
         {/* Progress bar — swap mock for your real <ProgressBar /> */}
