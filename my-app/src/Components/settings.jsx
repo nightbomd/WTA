@@ -2,8 +2,6 @@ import Icon from "./icon";
 import Button from "./btn";
 
 
-
-
 export default function Settings({ onBack, onSignOut, user }) {
     return (
         <main className="profile-page">
