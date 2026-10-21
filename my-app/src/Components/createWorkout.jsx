@@ -269,10 +269,14 @@ const StepExercises = ({ exercises, onUpdate, workoutType }) => {
     const searchValue = val.toLowerCase().trim();
 
     return availableExercises.filter(ex => {
-      return (
+      const matchesSearch =
         !searchValue ||
         ex.name.toLowerCase().includes(searchValue)
-      );
+
+      const isAlreadyAdded = exercises.some((addedEx) => {
+        addedEx.name.toLowerCase() === ex.name.toLowerCase();
+      });
+    return matchesSearch && !isAlreadyAdded;
     });
 
   };
