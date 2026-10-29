@@ -31,18 +31,6 @@ const formatDisplayDate = (dateStr) => {
   });
 };
 
-const calculateBMI = (weightKg, heightCm) => {
-  const weight = Number(weightKg);
-  const height = Number(heightCm);
-
-  if (!Number.isFinite(weight) || !Number.isFinite(height) || weight <= 0 || height <= 0) {
-    return null;
-  }
-
-  const heightInMeters = height / 100;
-  return (weight / (heightInMeters ** 2)).toFixed(1);
-};
-
 const weekdays = [
   "Monday",
   "Tuesday",
@@ -188,11 +176,34 @@ function App() {
   const statsSectionRef = useRef(null);
   const [shoulderScrollStat, setShouldScrollStat] = useState(false);
 
-  const currentWeight = Number(inquiryData.weight) || 0;
   const workoutCounter = workoutLog.length;
   const [showSettings, setShowSettings] = useState(false);
-  const [initWeight, setInitWeight] = useState(currentWeight);
+  const [initWeight, setInitWeight] = useState("");
   const [openWeightForm, setOpenWeightForm] = useState(false);
+  const [bmi, setBmi] = useState(null);
+
+  useEffect(() => {
+    setInitWeight(inquiryData.weight ?? "");
+  }, [inquiryData.weight]);
+
+  useEffect(() => {
+    const weightPounds = Number(initWeight);
+    const heightCm = Number(inquiryData.height);
+
+    if (
+      !Number.isFinite(weightPounds) ||
+      !Number.isFinite(heightCm) ||
+      weightPounds <= 0 ||
+      heightCm <= 0
+    ) {
+      setBmi(null);
+      return;
+    }
+
+    const weightKg = weightPounds * 0.45359237;
+    const heightInMeters = heightCm / 100;
+    setBmi((weightKg / (heightInMeters ** 2)).toFixed(1));
+  }, [initWeight, inquiryData.height]);
 
   const handleHomeClick = () => {
     setShouldScrollStat(false);
@@ -685,7 +696,7 @@ function App() {
                           }
                         }}
                       />
-                      <Button text="Set new weight" onClick={() => setOpenWeightForm(false)} />
+                      <Button text="Set new weight" onClick={handleSaveWeight} />
                     </div>
                   )}
                 </div>
@@ -694,14 +705,25 @@ function App() {
                   <div className="row justify-content-center g-3">
                     <div className="col-12 col-md-4">
                       <div style={{ backgroundColor: '#221f1fff' }} className="p-4 rounded-5 text-center h-100">
-                        <p className="fs-1 fw-bold mb-1 stat-value" style={{ color: 'var(--color-blue)' }}>{inquiryData.weight || '—'}kg</p>
+                        <p className="fs-1 fw-bold mb-1 stat-value" style={{ color: 'var(--color-blue)' }}>{initWeight || '—'} lbs</p>
                         <span className="text-secondary d-block stat-label">Weight</span>
                       </div>
                     </div>
                     <div className="col-12 col-md-4">
                       <div style={{ backgroundColor: '#221f1fff' }} className="p-4 rounded-5 text-center h-100">
-                        <p className="fs-1 fw-bold mb-1 stat-value" style={{ color: 'var(--color-blue)' }}>
-                          {calculateBMI(inquiryData.weight, inquiryData.height) ?? '—'}
+                        <p
+                          className="fs-1 fw-bold mb-1 stat-value"
+                          style={{
+                            color: bmi === null
+                              ? 'var(--color-blue)'
+                              : Number(bmi) < 18.5 || Number(bmi) >= 30
+                                ? '#ef4444'
+                                : Number(bmi) >= 25
+                                  ? '#f59e0b'
+                                  : 'var(--color-blue)'
+                          }}
+                        >
+                          {bmi ?? '—'}
                         </p>
                         <span className="text-secondary d-block stat-label">BMI</span>
                       </div>
