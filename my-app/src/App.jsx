@@ -191,6 +191,8 @@ function App() {
   const currentWeight = Number(inquiryData.weight) || 0;
   const workoutCounter = workoutLog.length;
   const [showSettings, setShowSettings] = useState(false);
+  const [initWeight, setInitWeight] = useState(currentWeight);
+  const [openWeightForm, setOpenWeightForm] = useState(false);
 
   const handleHomeClick = () => {
     setShouldScrollStat(false);
@@ -377,6 +379,43 @@ function App() {
     setIsGuestMode(false);
   };
 
+  const handleSaveWeight = async () => {
+  const weight = String(initWeight).trim();
+
+  // Validate before saving
+  if (!/^\d{1,3}$/.test(weight) || Number(weight) <= 0) {
+    console.error("Please enter a valid weight.");
+    return;
+  }
+
+  const updatedInquiryData = {
+    ...inquiryData,
+    weight: weight,
+  };
+
+  try {
+    if (user) {
+      await setDoc(
+        doc(db, "users", user.uid),
+        {
+          inquiryData: updatedInquiryData,
+        },
+        { merge: true }
+      );
+    } else {
+      localStorage.setItem(
+        "inquiryData",
+        JSON.stringify(updatedInquiryData)
+      );
+    }
+
+    setInquiryData(updatedInquiryData);
+    setOpenWeightForm(false);
+  } catch (error) {
+    console.error("Failed to save weight:", error);
+  }
+};
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -443,7 +482,7 @@ function App() {
                       onClick={() => { setEditingWorkout(null); setIsLoadingWorkout(true); }}
                       className="mb-2"
                     />
-                    
+
                     {!user && (
                       <>
                         <div className="d-flex flex-row"><p className="fs-5 text-secondary mb-2 account-warning"><span className="warning-icon"><Icon name="alert" size={20} /></span>Current workouts are not saved. Create an account to save workouts.</p></div>
@@ -622,11 +661,33 @@ function App() {
               {/* ── Muscle Progress + Stats ── */}
               <div className="row g-4 px-4 pb-4">
                 <div ref={statsSectionRef} style={{ background: 'var(--card-bg)' }} className="col-sm-12 col-md-6 col-lg-6 calorie-tracker rounded-5 p-4">
-                  <h2 className="text-light section-heading">Weight Progress ({currentWeight}) kg</h2>
+                  <h2 className="text-light section-heading">Weight Progress ({initWeight}) lbs</h2>
                   <p className="text-secondary mb-3">
                     A graph will show how your weekly sets for each muscle group increase over time.
                   </p>
-                  <Button text="Log Weight" onClick={() => { }} />
+                  <Button text="Log Weight" onClick={() => setOpenWeightForm(true)} />
+                  {openWeightForm && (
+                    <div>
+                      <input
+                        className="mt-3 mb-3 form-control"
+
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={3}
+                        value={initWeight}
+                        placeholder="Enter weight"
+                        onChange={(event) => {
+                          const newWeight = event.target.value;
+
+                          if (/^\d{0,3}$/.test(newWeight)) {
+                            setInitWeight(newWeight);
+                          }
+                        }}
+                      />
+                      <Button text="Set new weight" onClick={() => setOpenWeightForm(false)} />
+                    </div>
+                  )}
                 </div>
                 <div style={{ background: 'var(--card-bg)' }} className="col-sm-12 col-md-6 col-lg-6 rounded-5 p-4">
                   <h2 className="text-light section-heading">Stats</h2>
