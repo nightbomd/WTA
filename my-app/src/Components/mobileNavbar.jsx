@@ -7,7 +7,7 @@ const navItems = [
   { label: "Settings", icon: "nav-settings" },
 ];
 
-export default function MobileNavbar({ onHomeClick, onProfileClick, onStatsClick, onSettingsClick }) {
+export default function MobileNavbar({ onHomeClick, onProfileClick, onStatsClick, onSettingsClick, activeItem = "Home" }) {
   return (
     <nav className="mobile-navbar" aria-label="Mobile navigation">
       {navItems.map((item) => {
@@ -19,14 +19,16 @@ export default function MobileNavbar({ onHomeClick, onProfileClick, onStatsClick
         };
 
         const clickHandler = handler[item.label] || null;
+        const isActive = activeItem === item.label;
 
         if (clickHandler) {
           return (
             <button
               key={item.label}
               type="button"
-              className="mobile-navbar__item mobile-navbar__item--interactive"
+              className={`mobile-navbar__item mobile-navbar__item--interactive ${isActive ? "mobile-navbar__item--active" : ""}`.trim()}
               aria-label={item.label === "Home" ? "Go to home" : `Open ${item.label.toLowerCase()}`}
+              aria-current={isActive ? "page" : undefined}
               onClick={clickHandler}
             >
               <Icon name={item.icon} size={31} />

@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react'
-import ProgressBar from './Components/progressBar'
 import './App.css'
 import Button from "./Components/btn"
 import CreateWorkout from './Components/createWorkout'
@@ -68,19 +67,17 @@ const getLocalInquiryData = () => {
 const WorkoutHistoryCard = ({ workout, onEdit, onDelete }) => {
   const [open, setOpen] = useState(false);
   const ts = typeStyle(workout.type);
+  const detailsId = `workout-details-${workout.id}`;
+
   return (
-    <div style={{
-      background: 'var(--card-bg)',
-      borderRadius: 16,
-      border: '1px solid #222',
-      overflow: 'hidden',
-      transition: 'border-color 0.15s ease',
-    }}>
+    <div className="workout-history-card">
       {/* Header row */}
-      <div
-        className="d-flex align-items-center justify-content-between p-3"
-        style={{ cursor: 'pointer', gap: 12 }}
+      <button
+        type="button"
+        className="workout-history-toggle d-flex align-items-center justify-content-between p-3"
         onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
+        aria-controls={detailsId}
       >
         <div className="d-flex align-items-center gap-3" style={{ minWidth: 0 }}>
           <span className="px-2 py-1 rounded-4 text-nowrap"
@@ -98,14 +95,14 @@ const WorkoutHistoryCard = ({ workout, onEdit, onDelete }) => {
           </span>
           <span style={{ color: '#444', fontSize: 12 }}><Icon name={open ? "chevron-up" : "chevron-down"} size={12} /></span>
         </div>
-      </div>
+      </button>
 
       {/* Expanded exercises */}
       {open && (
-        <div style={{ borderTop: '1px solid #1e1e1e' }}>
+        <div id={detailsId} className="workout-history-details">
           <div className="px-3 pt-3 pb-2">
             {workout.exercises?.map((ex, i) => (
-              <div key={i} className="d-flex justify-content-between align-items-center mb-2">
+              <div key={i} className="workout-history-exercise d-flex justify-content-between align-items-center mb-2">
                 <span className="text-light" style={{ fontSize: 14 }}>{ex.name}</span>
                 <span className="text-secondary" style={{ fontSize: 12 }}>
                   {[ex.sets && `${ex.sets} sets`, ex.reps && `${ex.reps} reps`, ex.weight && `${ex.weight} lbs`]
@@ -116,11 +113,13 @@ const WorkoutHistoryCard = ({ workout, onEdit, onDelete }) => {
           </div>
           <div className="d-flex gap-2 px-3 pb-3">
             <button
+              type="button"
               onClick={(e) => { e.stopPropagation(); onEdit(workout); }}
               style={histStyles.editBtn}>
               Edit
             </button>
             <button
+              type="button"
               onClick={(e) => { e.stopPropagation(); onDelete(workout.id); }}
               style={histStyles.deleteBtn}>
               Delete
@@ -176,8 +175,8 @@ function App() {
   const statsSectionRef = useRef(null);
   const [shoulderScrollStat, setShouldScrollStat] = useState(false);
 
-  const workoutCounter = workoutLog.length;
   const [showSettings, setShowSettings] = useState(false);
+  const [activeNavItem, setActiveNavItem] = useState("Home");
   const [initWeight, setInitWeight] = useState("");
   const [openWeightForm, setOpenWeightForm] = useState(false);
   const [bmi, setBmi] = useState(null);
@@ -206,6 +205,7 @@ function App() {
   }, [initWeight, inquiryData.height]);
 
   const handleHomeClick = () => {
+    setActiveNavItem("Home");
     setShouldScrollStat(false);
 
     if (showProfile || showSettings) {
@@ -220,6 +220,7 @@ function App() {
     });
   };
   const handleStatsClick = () => {
+    setActiveNavItem("Stats");
     if (showProfile || showSettings) {
       setShouldScrollStat(true);
       setShowProfile(false);
@@ -235,6 +236,7 @@ function App() {
   };
 
   const handleSettingsClick = () => {
+    setActiveNavItem("Settings");
     setShouldScrollStat(false);
     setShowSettings(true);
     setShowProfile(false);
@@ -369,6 +371,7 @@ function App() {
   const handleSignOut = async () => {
     try {
       await signOut(auth);
+      setActiveNavItem("Home");
       setIsGuestMode(false);
       setOpenSignUp(true);
     } catch (error) {
@@ -464,25 +467,24 @@ function App() {
     <>
       {loading && <MainLoad fade={fade} />}
       {showProfile ? (
-        <DataStats inquiryData={inquiryData} setInquiryData={setInquiryData} onBack={() => setShowProfile(false)} />
+        <DataStats inquiryData={inquiryData} setInquiryData={setInquiryData} onBack={() => { setShowProfile(false); setActiveNavItem("Home"); }} />
       ) : showSettings ? (
-        <Settings onBack={() => setShowSettings(false)} onSignOut={handleSignOut} user={user} />
+        <Settings onBack={() => { setShowSettings(false); setActiveNavItem("Home"); }} onSignOut={handleSignOut} user={user} />
       ) : (
         <div ref={dashboardTopRef} style={{ background: 'var(--bg-color)' }} className="container-fluid app-shell">
 
 
           {/* ── Header ── */}
-          <div className="row g-4 p-4">
-            <header className="row w-100 g-4">
+          <header className="app-header p-4">
               {!isLoadingWorkout && (
-                <div className="col-sm-12 col-md-6">
+                <div className="app-header__intro">
                   <h1 className="mb-0 app-greeting">
                     <span className="text-light app-greeting__label">Welcome,</span>
                     <span className="app-greeting__name" style={{ color: 'var(--color-blue)' }}>{inquiryData.name}</span>
                   </h1>
                 </div>
               )}
-              <div className="create-workout col-sm-12 col-md-6 gap-3 d-flex flex-column justify-content-start">
+              <div className="create-workout dashboard-actions gap-3 d-flex flex-column justify-content-start">
                 {!isLoadingWorkout && (
                   <>
                     {!displayWorkout && isToday && (
@@ -504,51 +506,31 @@ function App() {
                   </>
                 )}
               </div>
-            </header>
-          </div>
+          </header>
 
           {!isLoadingWorkout && (
-            <main className="container-fluid">
+            <main className="container-fluid dashboard-main">
 
               {/* ── Date Filter ── */}
-              <div className="row px-4 pb-3">
-                <div className="col-12">
-                  <div className="d-flex text-secondary align-items-center gap-3 flex-wrap">
-                    <span className="filter-label" style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              <section className="dashboard-toolbar px-4 pb-3" aria-label="Workout date filter">
+                  <div className="date-toolbar d-flex text-secondary align-items-center gap-3 flex-wrap">
+                    <label htmlFor="workout-date" className="filter-label">
                       Filter by Date
-                    </span>
+                    </label>
                     <input
+                      id="workout-date"
+                      className="date-filter-input"
                       type="date"
                       value={selectedDate}
                       max={today}
                       onChange={e => setSelectedDate(e.target.value)}
-                      style={{
-                        background: 'var(--card-bg)',
-                        border: '1.5px solid #2a2a2a',
-                        borderRadius: 10,
-                        color: '#f0f0f0',
-                        fontSize: 14,
-                        padding: '8px 12px',
-                        outline: 'none',
-                        fontFamily: 'inherit',
-                        cursor: 'pointer',
-                        colorScheme: 'dark',
-                      }}
                     />
                     {!isToday && (
                       <button
+                        type="button"
+                        className="date-reset-button"
                         onClick={() => setSelectedDate(today)}
-                        style={{
-                          background: 'rgba(59,130,246,.1)',
-                          border: '1px solid rgba(59,130,246,.25)',
-                          borderRadius: 8,
-                          color: '#3b82f6',
-                          fontSize: 12,
-                          fontWeight: 700,
-                          padding: '8px 14px',
-                          cursor: 'pointer',
-                          fontFamily: 'inherit',
-                        }}>
+                      >
                         Back to Today
                       </button>
                     )}
@@ -556,21 +538,20 @@ function App() {
                       {formatDisplayDate(selectedDate)}
                     </span>
                   </div>
-                </div>
-              </div>
+              </section>
 
               {/* ── Main Cards ── */}
-              <div className="row g-4 px-4 pb-4">
+              <div className="dashboard-grid dashboard-grid--two px-4 pb-4">
 
                 {/* Today's Workout Card */}
-                <div style={{ background: 'var(--card-bg)' }} className="card-workout col-sm-12 col-md-6 col-lg-6 rounded-5 shadow p-4">
-                  <p className=" section-heading">
+                <section className="card-workout dashboard-card rounded-5 p-4">
+                  <h2 className="section-heading">
                     {isToday ? "Today's workout:" : formatDisplayDate(selectedDate)}
-                  </p>
+                  </h2>
 
                   {displayWorkout ? (
                     <>
-                      <h2 className="d-flex align-items-center gap-2 flex-wrap workout-heading">
+                      <h3 className="d-flex align-items-center gap-2 flex-wrap workout-heading">
                         {displayWorkout.name}
                         <span className="px-2 py-1 fs-5 rounded-4"
                           style={{ fontSize: 13, ...typeStyle(displayWorkout.type) }}>
@@ -581,7 +562,7 @@ function App() {
                             {formatDisplayDate(selectedDate)}
                           </span>
                         )}
-                      </h2>
+                      </h3>
                       {displayWorkout.muscles?.length > 0 && (
                         <div className="d-flex flex-wrap gap-2 mb-3">
                           {displayWorkout.muscles.map(m => (
@@ -593,11 +574,10 @@ function App() {
                           ))}
                         </div>
                       )}
-                      <ProgressBar
-                        text={`${displayWorkout.exercises?.length || 0} exercises`}
-                        value={100}
-                        bg="var(--color-blue)"
-                      />
+                      <div className="workout-exercise-count">
+                        <Icon name="dumbbell" size={16} />
+                        {displayWorkout.exercises?.length || 0} exercises
+                      </div>
                       <div className="exercise-list text-light mt-3">
                         <ul className="list-unstyled mb-0">
                           {displayWorkout.exercises?.map((exercise, idx) => (
@@ -622,31 +602,27 @@ function App() {
                       </button>
                     </>
                   ) : (
-                    <div className="d-flex flex-column align-items-start gap-2 mt-2">
+                    <div className="dashboard-empty-state d-flex flex-column align-items-start gap-2 mt-2">
                       <span className="today-workout-empty">
                         No workout logged{isToday ? ' today' : ' on this date'}.
                       </span>
                     </div>
                   )}
-                  <div className="streak-calendar mt-4">
-                    <span className="streak-label">Streak:</span>{' '}
-                    <span className="streak-value">None</span>
-                    {/* calendar goes here */}
-                  </div>
-                </div>
+                </section>
 
                 {/* Weekly Volume Card */}
-                <div style={{ background: 'var(--card-bg)' }} className="card-workout col-sm-12 col-md-6 col-lg-6 rounded-5 shadow p-4">
+                <section className="card-workout dashboard-card rounded-5 p-4">
                   <h2 className="text-light section-heading">Today's Volume <span className="section-heading__detail">({inquiryData.workoutDaysPerWeek} days)</span></h2>
                   {displayWorkout?.exercises?.length > 0 ? (
                     <div className="exercise-table">
                       <table className="table table-dark table-borderless mb-0" style={{ background: 'transparent' }}>
+                        <caption className="visually-hidden">Exercises logged for {formatDisplayDate(selectedDate)}</caption>
                         <thead>
                           <tr style={{ borderBottom: '1px solid #222' }}>
-                            <th style={{ color: '#666', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Exercise</th>
-                            <th style={{ color: '#666', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Sets</th>
-                            <th style={{ color: '#666', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Reps</th>
-                            <th style={{ color: '#666', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Weight</th>
+                            <th scope="col">Exercise</th>
+                            <th scope="col">Sets</th>
+                            <th scope="col">Reps</th>
+                            <th scope="col">Weight</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -664,24 +640,31 @@ function App() {
                       </table>
                     </div>
                   ) : (
-                    <p className="text-secondary">No workout data for this date.</p>
+                    <p className="dashboard-empty-state text-secondary mb-0">No workout data for this date.</p>
                   )}
-                </div>
+                </section>
               </div>
 
               {/* ── Muscle Progress + Stats ── */}
-              <div className="row g-4 px-4 pb-4">
-                <div ref={statsSectionRef} style={{ background: 'var(--card-bg)' }} className="col-sm-12 col-md-6 col-lg-6 calorie-tracker rounded-5 p-4">
-                  <h2 className="text-light section-heading">Weight Progress ({initWeight}) lbs</h2>
+              <div ref={statsSectionRef} className="dashboard-grid dashboard-grid--two dashboard-stats-section px-4 pb-4">
+                <section className="dashboard-card calorie-tracker rounded-5 p-4">
+                  <h2 className="text-light section-heading">Weight Progress</h2>
                   <p className="text-secondary mb-3">
-                    A graph will show how your weekly sets for each muscle group increase over time.
+                    Log your latest weight to keep your progress and BMI current.
                   </p>
-                  <Button text="Log Weight" onClick={() => setOpenWeightForm(true)} />
+                  {!openWeightForm && <Button text="Log Weight" onClick={() => setOpenWeightForm(true)} />}
                   {openWeightForm && (
-                    <div>
+                    <form
+                      className="weight-entry"
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        handleSaveWeight();
+                      }}
+                    >
+                      <label htmlFor="weight-entry-input" className="weight-entry__label">Weight in pounds</label>
                       <input
-                        className="mt-3 mb-3 form-control"
-
+                        id="weight-entry-input"
+                        className="form-control weight-entry__input"
                         type="text"
                         inputMode="numeric"
                         pattern="[0-9]*"
@@ -696,21 +679,20 @@ function App() {
                           }
                         }}
                       />
-                      <Button text="Set new weight" onClick={handleSaveWeight} />
-                    </div>
+                      <Button text="Save Weight" type="submit" />
+                    </form>
                   )}
-                </div>
-                <div style={{ background: 'var(--card-bg)' }} className="col-sm-12 col-md-6 col-lg-6 rounded-5 p-4">
+                </section>
+                <section className="dashboard-card rounded-5 p-4">
                   <h2 className="text-light section-heading">Stats</h2>
-                  <div className="row justify-content-center g-3">
-                    <div className="col-12 col-md-4">
-                      <div style={{ backgroundColor: '#221f1fff' }} className="p-4 rounded-5 text-center h-100">
-                        <p className="fs-1 fw-bold mb-1 stat-value" style={{ color: 'var(--color-blue)' }}>{initWeight || '—'} lbs</p>
+                  <div className="stats-grid">
+                    <div className="stat-card p-4 rounded-5 text-center">
+                        <p className="fs-1 fw-bold mb-1 stat-value" style={{ color: 'var(--color-blue)' }}>
+                          {initWeight || '—'}{initWeight && <span className="stat-unit"> lbs</span>}
+                        </p>
                         <span className="text-secondary d-block stat-label">Weight</span>
-                      </div>
                     </div>
-                    <div className="col-12 col-md-4">
-                      <div style={{ backgroundColor: '#221f1fff' }} className="p-4 rounded-5 text-center h-100">
+                    <div className="stat-card p-4 rounded-5 text-center">
                         <p
                           className="fs-1 fw-bold mb-1 stat-value"
                           style={{
@@ -726,35 +708,27 @@ function App() {
                           {bmi ?? '—'}
                         </p>
                         <span className="text-secondary d-block stat-label">BMI</span>
-                      </div>
                     </div>
-                    <div className="col-12 col-md-4">
-                      <div style={{ backgroundColor: '#221f1fff' }} className="p-4 rounded-5 text-center h-100">
+                    <div className="stat-card stat-card--goal p-4 rounded-5 text-center">
                         <p className="fs-1 fw-bold mb-1 stat-value" style={{ color: 'var(--color-blue)' }}>{inquiryData.goal || '—'}</p>
                         <span className="text-secondary d-block stat-label">Goal Deadline</span>
-                      </div>
                     </div>
                   </div>
-                </div>
+                </section>
               </div>
 
               {/* ── Workout History ── */}
-              <div className="row g-4 px-4 pb-5">
-                <div className="col-12">
-                  <div style={{ background: 'var(--card-bg)' }} className="rounded-5 p-4">
-                    <div className="d-flex align-items-center justify-content-between mb-4">
-                      <h2 className="text-light section-heading mb-0">Workout History <span className="text-secondary">({workoutCounter})</span></h2>
-                      <span className="history-count" style={{
-                        fontSize: 12, fontWeight: 700, color: '#555',
-                        background: '#1a1a1a', border: '1px solid #2a2a2a',
-                        borderRadius: 99, padding: '4px 12px'
-                      }}>
+              <section className="dashboard-history px-4 pb-5">
+                  <div className="dashboard-card rounded-5 p-4">
+                    <div className="history-heading-row d-flex align-items-center justify-content-between mb-4">
+                      <h2 className="text-light section-heading mb-0">Workout History</h2>
+                      <span className="history-count">
                         {workoutLog.length} total
                       </span>
                     </div>
 
                     {workoutLog.length === 0 ? (
-                      <div className="text-center py-4">
+                      <div className="dashboard-empty-state text-center py-4">
                         <div style={{ fontSize: 32, marginBottom: 10 }}><Icon name="clipboard" size={32} /></div>
                         <p className="text-secondary mb-0">No workouts logged yet. Get after it.</p>
                       </div>
@@ -770,13 +744,9 @@ function App() {
                           }, {})
                       ).map(([date, workouts]) => (
                         <div key={date} className="mb-4">
-                          <div className="history-date-label" style={{
-                            fontSize: 11, fontWeight: 700, color: date === today ? '#3b82f6' : '#555',
-                            textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10,
-                            paddingBottom: 8, borderBottom: '1px solid #1e1e1e',
-                          }}>
+                          <h3 className={`history-date-label ${date === today ? "history-date-label--today" : ""}`.trim()}>
                             {date === today ? '● Today — ' : ''}{formatDisplayDate(date)}
-                          </div>
+                          </h3>
                           <div className="d-flex flex-column gap-2">
                             {workouts.map(w => (
                               <WorkoutHistoryCard
@@ -791,8 +761,7 @@ function App() {
                       ))
                     )}
                   </div>
-                </div>
-              </div>
+              </section>
 
             </main>
           )}
@@ -803,12 +772,14 @@ function App() {
         <MobileNavbar
           onHomeClick={handleHomeClick}
           onProfileClick={() => {
+            setActiveNavItem("Profile");
             setShouldScrollStat(false);
             setShowSettings(false);
             setShowProfile(true);
           }}
           onStatsClick={handleStatsClick}
           onSettingsClick={handleSettingsClick}
+          activeItem={activeNavItem}
         />
       )}
 

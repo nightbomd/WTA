@@ -1,7 +1,10 @@
-export default function Select({ options, value, onChange }) {
+export default function Select({ options, value, onChange, id, ariaLabel, className = "", style = {} }) {
   return (
-    <select 
-        value={value} 
+    <select
+        id={id}
+        aria-label={ariaLabel}
+        className={className}
+        value={value}
         onChange={e => onChange(e.target.value)}
         style={{
           width: "100%",
@@ -15,7 +18,8 @@ export default function Select({ options, value, onChange }) {
           boxSizing: "border-box",
           fontFamily: "inherit",
           transition: "border-color 0.15s ease",
-          margin: "10px 0"
+          margin: "10px 0",
+          ...style,
         }}
       >
       {options.map(option => (

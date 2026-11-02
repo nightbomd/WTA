@@ -129,9 +129,11 @@ function OptionCards({ options, selected, setSelected }) {
     <div className="option-grid">
       {options.map((option) => (
         <button
+          type="button"
           key={option.id}
           className={`option-card ${selected.includes(option.id) ? "selected" : ""
             }`}
+          aria-pressed={selected.includes(option.id)}
           onClick={() => toggleOption(option.id)}
         >
           <div className="option-image">
@@ -212,11 +214,11 @@ export default function Inquiry({ setIsRegistering, setInquiryData }) {
     <>
 
       <main className="container p-5 col-sm-8 col-md-5 col-lg-5 text-center inquiry-page">
-        <h1 className="inquiry-heading">Lets Get you <span style={{ color: "#3592f5ff" }}>Started</span>.</h1>
+        <h1 className="inquiry-heading">Let&apos;s get you <span style={{ color: "#3592f5ff" }}>started</span>.</h1>
         <div className="logo text-center">
           <img style={{ width: '100px', height: '100px', margin: '0 auto' }} src={`${import.meta.env.BASE_URL}app-logo.png`} alt="Logo"></img>
         </div>
-        <ProgressBar bg="#007bff" value={Math.floor(((step + 1) / formQuestion.length) * 100)} />
+        <ProgressBar text={`Step ${step + 1} of ${formQuestion.length}`} bg="#007bff" value={Math.floor(((step + 1) / formQuestion.length) * 100)} />
         <div className="question-container py-5">
 
           <h2 className="mb-5 inquiry-question">{formQuestion[step].question}</h2>
@@ -225,6 +227,7 @@ export default function Inquiry({ setIsRegistering, setInquiryData }) {
             <input
               type="text"
               className="form-control"
+              aria-label="Your name"
               value={formData.name || ""}
               onChange={(e) => handleChange("name", e.target.value)}
             />
@@ -243,6 +246,7 @@ export default function Inquiry({ setIsRegistering, setInquiryData }) {
               <input
                 type="text"
                 className="form-control"
+                aria-label="Height in centimeters"
                 placeholder="Height (cm)"
                 value={formData.height || ""}
                 onChange={(e) => handleHeightWeightChange("height", e.target.value)}
@@ -250,7 +254,8 @@ export default function Inquiry({ setIsRegistering, setInquiryData }) {
               <input
                 type="text"
                 className="form-control"
-                placeholder="Weight (kg)"
+                aria-label="Weight in pounds"
+                placeholder="Weight (lbs)"
                 value={formData.weight || ""}
                 onChange={(e) => handleHeightWeightChange("weight", e.target.value)}
               />
@@ -317,17 +322,15 @@ export default function Inquiry({ setIsRegistering, setInquiryData }) {
           )}
         </div>
 
-        <div className="d-flex gap-5">
+        <div className="inquiry-actions d-flex gap-5">
           <Button
             onClick={() => setStep(step - 1)}
-            style={{ width: "100% !important" }}
             text={"Back"}
             bg="#282f36ff"
             isDisabled={step === 0}
           />
           <Button
             onClick={step === formQuestion.length - 1 ? handleSubmit : () => setStep(step + 1)}
-            style={{ width: "100% !important" }}
             text={step === formQuestion.length - 1 ? "Submit" : "Next"}
 
           />

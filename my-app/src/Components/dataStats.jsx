@@ -37,7 +37,7 @@ function DataStats({ inquiryData = {}, setInquiryData, onBack }) {
     {
       label: "Weight",
       key: "weight",
-      value: displayValue(inquiryData.weight, " kg"),
+      value: displayValue(inquiryData.weight, " lbs"),
     },
     {
       label: "Primary goal",
@@ -213,7 +213,9 @@ function DataStats({ inquiryData = {}, setInquiryData, onBack }) {
                 <strong>{field.value}</strong>
 
                 <Button
-                  color="white"
+                  bg="#1c1c1c"
+                  color="#9ec5fe"
+                  border="1px solid #33445c"
                   text="Edit"
                   onClick={() => handleEdit(field)}
                 />

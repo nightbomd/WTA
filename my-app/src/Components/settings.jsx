@@ -20,24 +20,36 @@ export default function Settings({ onBack, onSignOut, user }) {
             </header>
 
             <section
-                className="profile-data-card p-3"
-                aria-label="Inquiry data"
+                className="profile-data-card settings-card"
+                aria-label="Account settings"
             >
-                <div className="mb-5">
-                    <h2>
-                        Account:
-                    </h2>
-                    <p> Signed in as {user?.email || "Guest"}</p>
-                    <Button onClick={onSignOut} className="col-6" text="Sign Out"></Button>
+                <div className="settings-section">
+                    <div className="settings-section__copy">
+                        <h2>Account</h2>
+                        <p>Signed in as {user?.email || "Guest"}</p>
+                    </div>
+                    {user && (
+                        <Button
+                            onClick={onSignOut}
+                            className="settings-action"
+                            text="Sign Out"
+                        />
+                    )}
                 </div>
-                <h2>
+
+                <div className="settings-section settings-section--danger">
+                    <div className="settings-section__copy">
+                        <h2>Danger zone</h2>
+                        <p>Delete your account and its saved workout data.</p>
+                    </div>
                     <Button
                         text="Delete Account"
                         bg="#1c1c1c"
                         color="#ef4444"
                         border="1px solid #4a2626"
+                        className="settings-action"
                     />
-                </h2>
+                </div>
             </section>
         </main>
     );

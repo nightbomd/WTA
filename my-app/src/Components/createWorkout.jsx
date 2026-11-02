@@ -73,7 +73,7 @@ const weekDays = {
 
 // --- Chip ---
 const Chip = ({ label, selected, onClick }) => (
-  <button onClick={onClick} style={{
+  <button type="button" aria-pressed={selected} onClick={onClick} style={{
     padding: "7px 14px", borderRadius: 99,
     border: selected ? "1.5px solid #3b82f6" : "1.5px solid #2a2a2a",
     background: selected ? "rgba(59,130,246,0.12)" : "#161616",
@@ -88,9 +88,6 @@ const Chip = ({ label, selected, onClick }) => (
 
 // --- Step 1: Name & Type ---
 const StepNameType = ({ data, onChange }) => {
-  const [selectedDay, setSelectedDay] = useState("");
-
-
   const handlePresetMuscleTags = (type) => {
     let presetMuscleTags;
     switch (type) {
@@ -132,7 +129,9 @@ const StepNameType = ({ data, onChange }) => {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
       <div style={{ width: "100%" }}>
+        <label htmlFor="workout-day" style={S.label}>Workout Day</label>
         <Select
+          id="workout-day"
           options={[
             { value: "", label: "Day" },
             { value: "monday", label: "Monday " },
@@ -143,15 +142,15 @@ const StepNameType = ({ data, onChange }) => {
             { value: "saturday", label: "Saturday " },
             { value: "sunday", label: "Sunday " },
           ]}
-          value={data.day}
+          value={data.day || ""}
           onChange={value => {
-            setSelectedDay(value);
             onChange({ ...data, day: value });
           }}
           style={{ ...S.select }}
         />
-        <label style={S.label}>Workout Name</label>
+        <label htmlFor="workout-name" style={S.label}>Workout Name</label>
         <input
+          id="workout-name"
           type="text" placeholder="e.g. Monday Push Day"
           value={data.name}
           onChange={e => onChange({ ...data, name: e.target.value })}
@@ -200,8 +199,8 @@ const ExerciseCard = ({ exercise, onUpdate, onRemove }) => {
           )}
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <button onClick={() => setOpen(o => !o)} style={S.iconBtn} aria-label={open ? "Collapse exercise" : "Expand exercise"}><Icon name={open ? "chevron-up" : "chevron-down"} size={12} /></button>
-          <button onClick={onRemove} style={{ ...S.iconBtn, color: "#ef4444" }} aria-label="Remove exercise"><Icon name="close" size={13} /></button>
+          <button type="button" onClick={() => setOpen(o => !o)} style={S.iconBtn} aria-label={open ? "Collapse exercise" : "Expand exercise"}><Icon name={open ? "chevron-up" : "chevron-down"} size={12} /></button>
+          <button type="button" onClick={onRemove} style={{ ...S.iconBtn, color: "#ef4444" }} aria-label="Remove exercise"><Icon name="close" size={13} /></button>
         </div>
       </div>
       {open && (
@@ -212,8 +211,8 @@ const ExerciseCard = ({ exercise, onUpdate, onRemove }) => {
             { key: "weight", label: "Weight", placeholder: "lbs" },
           ].map(({ key, label, placeholder }) => (
             <div key={key}>
-              <div style={{ fontSize: 11, color: "#666", marginBottom: 5, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</div>
-              <input type="number" placeholder={placeholder}
+              <label htmlFor={`exercise-${exercise.id}-${key}`} style={{ fontSize: 11, color: "#777", marginBottom: 5, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", display: "block" }}>{label}</label>
+              <input id={`exercise-${exercise.id}-${key}`} type="number" inputMode="decimal" placeholder={placeholder}
                 value={exercise[key] || ""}
                 onChange={e => onUpdate({ ...exercise, [key]: e.target.value })}
                 style={{ ...S.input, padding: "10px 8px", textAlign: "center", fontSize: 15 }}
@@ -221,8 +220,8 @@ const ExerciseCard = ({ exercise, onUpdate, onRemove }) => {
             </div>
           ))}
           <div style={{ gridColumn: "1 / -1" }}>
-            <div style={{ fontSize: 11, color: "#666", marginBottom: 5, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>Notes</div>
-            <input type="text" placeholder="Optional note..."
+            <label htmlFor={`exercise-${exercise.id}-notes`} style={{ fontSize: 11, color: "#777", marginBottom: 5, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", display: "block" }}>Notes</label>
+            <input id={`exercise-${exercise.id}-notes`} type="text" placeholder="Optional note..."
               value={exercise.notes || ""}
               onChange={e => onUpdate({ ...exercise, notes: e.target.value })}
               style={{ ...S.input, fontSize: 13 }}
@@ -273,10 +272,11 @@ const StepExercises = ({ exercises, onUpdate, workoutType }) => {
         !searchValue ||
         ex.name.toLowerCase().includes(searchValue)
 
-      const isAlreadyAdded = exercises.some((addedEx) => {
-        addedEx.name.toLowerCase() === ex.name.toLowerCase();
-      });
-    return matchesSearch && !isAlreadyAdded;
+      const isAlreadyAdded = exercises.some(
+        (addedEx) => addedEx.name.toLowerCase() === ex.name.toLowerCase()
+      );
+
+      return matchesSearch && !isAlreadyAdded;
     });
 
   };
@@ -332,20 +332,23 @@ const StepExercises = ({ exercises, onUpdate, workoutType }) => {
       ))}
       {showAdd ? (
         <div ref={pickerRef} style={{ position: "relative" }}>
-          <div style={{ display: "flex", gap: 8 }}>
+          <div className="exercise-picker-row" style={{ display: "flex", gap: 8 }}>
             <input
               type="text" placeholder="Search exercises..."
+              aria-label="Search exercises"
+              aria-expanded={suggestions.length > 0}
+              aria-controls="exercise-suggestions"
               value={query}
               onChange={e => handleQueryChange(e.target.value)}
               onKeyDown={handleKeyDown}
               autoFocus
               style={{ ...S.input, flex: 1 }}
             />
-            <button onClick={() => commitExercise(query)} style={S.primaryBtn}>Add</button>
-            <button onClick={() => { setShowAdd(false); setQuery(""); setSuggestions([]); }} style={S.ghostBtn} aria-label="Cancel adding exercise"><Icon name="close" size={14} /></button>
+            <button type="button" onClick={() => commitExercise(query)} style={S.primaryBtn}>Add</button>
+            <button type="button" onClick={() => { setShowAdd(false); setQuery(""); setSuggestions([]); }} style={S.ghostBtn} aria-label="Cancel adding exercise"><Icon name="close" size={14} /></button>
           </div>
           {suggestions.length > 0 && (
-            <div style={{
+            <div id="exercise-suggestions" role="listbox" aria-label="Exercise suggestions" style={{
               position: "absolute", top: "calc(100% + 6px)", left: 0,
               right: 0, background: "#1a1a1a",
               border: "1.5px solid #2a2a2a", borderRadius: 12,
@@ -356,15 +359,19 @@ const StepExercises = ({ exercises, onUpdate, workoutType }) => {
                 const badge = MUSCLE_BADGE_COLORS[ex.muscle] || { bg: "#222", color: "#888" };
                 const isHighlighted = i === highlightIdx;
                 return (
-                  <div
+                  <button
+                    type="button"
+                    role="option"
+                    aria-selected={isHighlighted}
                     key={ex.name}
-                    onMouseDown={() => commitExercise(ex.name)}
+                    onClick={() => commitExercise(ex.name)}
                     onMouseEnter={() => setHighlightIdx(i)}
                     style={{
                       display: "flex", alignItems: "center", justifyContent: "space-between",
+                      width: "100%", textAlign: "left", color: "inherit",
                       padding: "11px 14px",
                       background: isHighlighted ? "#242424" : "transparent",
-                      borderBottom: i < suggestions.length - 1 ? "1px solid #222" : "none",
+                      border: "none", borderBottom: i < suggestions.length - 1 ? "1px solid #222" : "none",
                       cursor: "pointer", transition: "background 0.1s ease",
                     }}
                   >
@@ -377,14 +384,14 @@ const StepExercises = ({ exercises, onUpdate, workoutType }) => {
                     }}>
                       {ex.muscle}
                     </span>
-                  </div>
+                  </button>
                 );
               })}
             </div>
           )}
         </div>
       ) : (
-        <button onClick={handleOpenAdd} style={S.addExerciseBtn}>+ Add Exercise</button>
+        <button type="button" onClick={handleOpenAdd} style={S.addExerciseBtn}>+ Add Exercise</button>
       )}
     </div>
   );
@@ -435,7 +442,7 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
   const [animating, setAnimating] = useState(false);
-  const [workoutData, setWorkoutData] = useState({ name: "", type: "", muscles: [] });
+  const [workoutData, setWorkoutData] = useState({ name: "", type: "", muscles: [], day: "" });
   const [exercises, setExercises] = useState([]);
   const [draftLoaded, setDraftLoaded] = useState(false); // flag to prevent save before draft loads
 
@@ -452,7 +459,7 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
 
     const loadWorkout = async () => {
       if (isEditing) {
-        setWorkoutData({ name: initialData.name, type: initialData.type, muscles: initialData.muscles || [] });
+        setWorkoutData({ name: initialData.name, type: initialData.type, muscles: initialData.muscles || [], day: initialData.day || "" });
         setExercises(initialData.exercises || []);
       } else if (auth.currentUser) {
         try {
@@ -460,7 +467,7 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
           if (cancelled) return;
           const draft = userDoc.exists() ? userDoc.data().workoutDraft : null;
           if (draft) {
-            setWorkoutData(draft.workoutData || { name: "", type: "", muscles: [] });
+            setWorkoutData(draft.workoutData || { name: "", type: "", muscles: [], day: "" });
             setExercises(draft.exercises || []);
           }
         } catch (error) {
@@ -523,10 +530,10 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
   if (!isLoadingWorkout) return null;
 
   return (
-    <div style={S.root}>
+    <div className="create-workout-screen" style={S.root}>
       {/* Header */}
-      <div style={S.header}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+      <div className="create-workout-header" style={S.header}>
+        <div className="create-workout-header-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
           <h1 style={S.title}>
             {isEditing
               ? <><span style={{ color: "#f59e0b" }}>Edit</span> Workout</>
@@ -553,7 +560,14 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
               {STEPS[step].progress}%
             </span>
           </div>
-          <div style={{ background: "#1f1f1f", borderRadius: 99, height: 3 }}>
+          <div
+            role="progressbar"
+            aria-label={`Step ${step + 1} of ${STEP_COUNT}: ${STEPS[step].label}`}
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow={STEPS[step].progress}
+            style={{ background: "#1f1f1f", borderRadius: 99, height: 3 }}
+          >
             <div style={{
               background: isEditing
                 ? "linear-gradient(90deg, #cd8f25ff, #c38f2eff)"
@@ -565,7 +579,7 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
           </div>
         </div>
         {/* Step dots */}
-        <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 14 }}>
+        <div aria-hidden="true" style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 14 }}>
           {STEPS.map((_, i) => (
             <div key={i} style={{
               width: i === step ? 20 : 6, height: 6, borderRadius: 99,
@@ -579,7 +593,7 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
       </div>
 
       {/* Step Content */}
-      <div ref={contentRef} style={{
+      <div ref={contentRef} className="create-workout-content" style={{
         ...S.scrollContent,
         opacity: animating ? 0 : 1,
         transform: animating ? `translateX(${direction * 24}px)` : "translateX(0)",
@@ -597,18 +611,18 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
       </div>
 
       {/* Bottom Nav */}
-      <div style={S.bottomNav}>
+      <div className="create-workout-bottom-nav" style={S.bottomNav}>
         {step > 0
-          ? <button onClick={() => navigate(-1)} style={S.backBtn}><Icon name="arrow-left" size={15} /> Back</button>
+          ? <button type="button" onClick={() => navigate(-1)} style={S.backBtn}><Icon name="arrow-left" size={15} /> Back</button>
           : <div />
         }
         {step < STEP_COUNT - 1 ? (
-          <button onClick={() => canNext() && navigate(1)} disabled={!canNext()}
+          <button type="button" onClick={() => canNext() && navigate(1)} disabled={!canNext()}
             style={{ ...S.nextBtn, opacity: canNext() ? 1 : 0.35, background: isEditing ? "linear-gradient(135deg, #bb8323ff, #c08320ff)" : "linear-gradient(135deg, #3b82f6, #6366f1)" }}>
             Next <Icon name="arrow-right" size={15} />
           </button>
         ) : (
-          <button onClick={() => { console.log('[CreateWorkout] Save button clicked'); handleSave(); }} style={{
+          <button type="button" onClick={() => { console.log('[CreateWorkout] Save button clicked'); handleSave(); }} style={{
             ...S.saveBtn,
             background: isEditing
               ? "linear-gradient(135deg, #bb8323ff, #c08320ff)"
@@ -626,6 +640,7 @@ export default function CreateWorkout({ isLoadingWorkout, initialData, onSave, o
 const S = {
   root: {
     display: "flex", flexDirection: "column",
+    alignItems: "center",
     height: "100dvh", minHeight: "100svh", width: "100%",
     background: "#0f0f0f", color: "#f0f0f0",
     fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
@@ -634,6 +649,7 @@ const S = {
     overscrollBehavior: "none",
   },
   header: {
+    width: "100%", maxWidth: 820, boxSizing: "border-box",
     padding: "calc(52px + env(safe-area-inset-top)) 20px 16px",
     background: "#0f0f0f",
     borderBottom: "1px solid #1a1a1a",
@@ -642,7 +658,7 @@ const S = {
   scrollContent: {
     flex: 1,
     minHeight: 0,
-    width: "100%",
+    width: "100%", maxWidth: 820,
     overflowX: "hidden",
     overflowY: "auto",
     padding: "20px 20px 24px",
@@ -659,7 +675,7 @@ const S = {
     outline: "none", boxSizing: "border-box", fontFamily: "inherit", transition: "border-color 0.15s ease",
   },
   card: { background: "#161616", borderRadius: 12, padding: "16px", border: "1px solid #222" },
-  iconBtn: { background: "none", border: "none", color: "#555", cursor: "pointer", fontSize: 12, padding: "4px 8px", borderRadius: 6 },
+  iconBtn: { display: "inline-flex", alignItems: "center", justifyContent: "center", width: 40, height: 40, background: "none", border: "none", color: "#777", cursor: "pointer", fontSize: 12, padding: 0, borderRadius: 8 },
   addExerciseBtn: {
     width: "100%", padding: "14px", background: "transparent",
     border: "1.5px dashed #2a2a2a", borderRadius: 12,
@@ -680,6 +696,7 @@ const S = {
   statChip: { fontSize: 12, color: "#666", fontWeight: 600 },
   bottomNav: {
     display: "flex", justifyContent: "space-between", alignItems: "center",
+    width: "100%", maxWidth: 820, boxSizing: "border-box",
     padding: "16px 20px calc(32px + env(safe-area-inset-bottom))", borderTop: "1px solid #1a1a1a",
     background: "#0f0f0f", flexShrink: 0, gap: 12,
   },

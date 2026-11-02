@@ -46,6 +46,7 @@ export default function SignUp({ openSignUp, setOpenSignUp, setUser, onContinueW
             switch (error.code) {
                 case "auth/invalid-email":
                     setErrorMessage("Invalid email format.");
+                    break;
 
                 case "auth/invalid-credential":
                 case "auth/user-not-found":
@@ -62,8 +63,8 @@ export default function SignUp({ openSignUp, setOpenSignUp, setUser, onContinueW
     }
 
     return (
-        <main className="signup-page d-flex justify-content-center align-items-center ">
-            <div className="signup-card text-center col-lg-2 col-md-2 col-sm-6">
+        <main className="signup-page d-flex justify-content-center align-items-center">
+            <div className="signup-card text-center">
 
                 <img
                     src={`${import.meta.env.BASE_URL}app-logo.png`}
@@ -71,12 +72,20 @@ export default function SignUp({ openSignUp, setOpenSignUp, setUser, onContinueW
                     className="signup-logo"
                 />
 
-                <form className="d-flex flex-column gap-3">
+                <form
+                    className="signup-form d-flex flex-column gap-3"
+                    onSubmit={(event) => {
+                        event.preventDefault();
+                        logInWithEmailAndPassword();
+                    }}
+                >
 
                     <input
                         className="form-control"
                         type="email"
                         placeholder="Email"
+                        aria-label="Email address"
+                        autoComplete="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
@@ -85,13 +94,15 @@ export default function SignUp({ openSignUp, setOpenSignUp, setUser, onContinueW
                         className="form-control"
                         type="password"
                         placeholder="Password"
+                        aria-label="Password"
+                        autoComplete="current-password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
 
                     <button
                         type="button"
-                        className="btn btn-outline-light d-flex align-items-center w-100"
+                        className="btn btn-outline-light d-flex align-items-center justify-content-center gap-2 w-100"
                         onClick={handleGoogleSignUp}
                     >
                         <img src={`${import.meta.env.BASE_URL}google.png`} style={{ height: "22px", width: "auto" }} className="img-fluid" alt="Google Logo" /> Sign Up with Google
@@ -99,11 +110,14 @@ export default function SignUp({ openSignUp, setOpenSignUp, setUser, onContinueW
 
                     <button
                         type="button"
-                        className="btn btn-outline-light  d-flex  align-items-center w-100"
-                        onClick={handleGoogleSignUp}
+                        className="btn btn-outline-light d-flex align-items-center justify-content-center gap-2 w-100"
+                        disabled
+                        title="Apple sign-in is coming soon"
                     >
-                        <img src={`${import.meta.env.BASE_URL}apple-logo.png`} style={{ height: "30px", width: "auto" }} className="img-fluid" alt="Apple Logo" /> Sign Up with Apple
+                        <img src={`${import.meta.env.BASE_URL}apple-logo.png`} style={{ height: "30px", width: "auto" }} className="img-fluid" alt="" /> Apple Sign-In Coming Soon
                     </button>
+
+                    <div className="signup-divider" aria-hidden="true"><span>or</span></div>
 
                     <div className="d-flex gap-2">
 
@@ -134,7 +148,7 @@ export default function SignUp({ openSignUp, setOpenSignUp, setUser, onContinueW
                     >
                         Continue Without an Account
                     </button>
-                    <p className="text-danger">{errorMessage}</p>
+                    {errorMessage && <p className="text-danger mb-0" role="alert">{errorMessage}</p>}
 
                 </form>
 
