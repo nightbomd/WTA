@@ -463,7 +463,7 @@ textarea {
   box-shadow: 0 0 0 3px rgba(121, 174, 242, 0.16) !important;
   outline: none !important;
 }
-.inquiry-age-select {
+.inquiry-select {
   width: min(100%, 24rem);
   min-height: 3.25rem;
   margin-inline: auto;
@@ -573,6 +573,24 @@ option {
 
 .option-image {
   font-size: 3rem;
+}
+
+.option-image--png {
+  width: 52px;
+  height: 52px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #000;
+}
+
+.option-image--png img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(2);
+  filter: grayscale(1) brightness(0.82) contrast(1.15);
+  opacity: 0.78;
 }
 
 .option-card p {

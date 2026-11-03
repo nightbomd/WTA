@@ -36,7 +36,7 @@ const formQuestion = [
     type: "select",
     options: [
       { id: "lose-fat", name: "Lose Fat", image: "flame" },
-      { id: "build-muscle", name: "Build Muscle", image: "flexed-arm" },
+      { id: "build-muscle", name: "Build Muscle", imageSrc: "build-muscle-png.png" },
       { id: "gain-strength", name: "Gain Strength", image: "barbell" },
       { id: "improve-endurance", name: "Improve Endurance", image: "runner" },
       { id: "general-health", name: "General Health", image: "medical" },
@@ -58,13 +58,13 @@ const formQuestion = [
     type: "select",
     options: [
 
-      { id: "1", name: "1 Day", image: "calendar" },
-      { id: "2", name: "2 Days", image: "calendar" },
-      { id: "3", name: "3 Days", image: "calendar" },
-      { id: "4", name: "4 Days", image: "calendar" },
-      { id: "5", name: "5 Days", image: "calendar" },
-      { id: "6", name: "6 Days", image: "calendar" },
-      { id: "7", name: "7 Days", image: "calendar" },
+      { id: "1", name: "1 Day" },
+      { id: "2", name: "2 Days" },
+      { id: "3", name: "3 Days" },
+      { id: "4", name: "4 Days" },
+      { id: "5", name: "5 Days" },
+      { id: "6", name: "6 Days" },
+      { id: "7", name: "7 Days" },
     ],
   },
   {
@@ -136,8 +136,16 @@ function OptionCards({ options, selected, setSelected }) {
           aria-pressed={selected.includes(option.id)}
           onClick={() => toggleOption(option.id)}
         >
-          <div className="option-image">
-            <Icon name={option.image} size={42} />
+          <div className={`option-image${option.imageSrc ? " option-image--png" : ""}`}>
+            {option.imageSrc ? (
+              <img
+                src={`${import.meta.env.BASE_URL}${option.imageSrc}`}
+                alt=""
+                aria-hidden="true"
+              />
+            ) : (
+              <Icon name={option.image} size={42} />
+            )}
           </div>
 
           <p>{option.name}</p>
@@ -235,7 +243,7 @@ export default function Inquiry({ setIsRegistering, setInquiryData }) {
 
           {step === 1 && (
             <select
-              className="form-select inquiry-age-select"
+              className="form-select inquiry-select"
               aria-label="Age range"
               value={Array.isArray(formData.ageRange) ? formData.ageRange[0] || "" : formData.ageRange || ""}
               onChange={(event) => handleChange("ageRange", event.target.value)}
@@ -285,11 +293,17 @@ export default function Inquiry({ setIsRegistering, setInquiryData }) {
           )}
 
           {step === 5 && (
-            <OptionCards
-              options={formQuestion[step].options}
-              selected={formData.workoutDaysPerWeek || []}
-              setSelected={(values) => handleChange("workoutDaysPerWeek", values)}
-            />
+            <select
+              className="form-select inquiry-select"
+              aria-label="Workout days per week"
+              value={Array.isArray(formData.workoutDaysPerWeek) ? formData.workoutDaysPerWeek[0] || "" : formData.workoutDaysPerWeek || ""}
+              onChange={(event) => handleChange("workoutDaysPerWeek", event.target.value)}
+            >
+              <option value="" disabled>Select days per week</option>
+              {formQuestion[step].options.map((option) => (
+                <option key={option.id} value={option.id}>{option.name}</option>
+              ))}
+            </select>
           )}
 
           {step === 6 && (
