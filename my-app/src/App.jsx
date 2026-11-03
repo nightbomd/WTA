@@ -460,7 +460,17 @@ function App() {
 
   // Show SignUp ONLY if explicitly opened AND user isn't signed in
   if (openSignUp && !user) {
-    return <SignUp setUser={setUser} openSignUp={openSignUp} setOpenSignUp={setOpenSignUp} onContinueWithoutAccount={handleContinueWithoutAccount} onSignedIn={handleSignedIn} />;
+    return <SignUp
+      setUser={setUser}
+      openSignUp={openSignUp}
+      setOpenSignUp={setOpenSignUp}
+      onContinueWithoutAccount={handleContinueWithoutAccount}
+      onSignedIn={handleSignedIn}
+      onPreviewInquiry={() => {
+        setIsRegistering(false);
+        setOpenSignUp(false);
+      }}
+    />;
   }
 
   return (

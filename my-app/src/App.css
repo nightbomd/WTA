@@ -463,6 +463,14 @@ textarea {
   box-shadow: 0 0 0 3px rgba(121, 174, 242, 0.16) !important;
   outline: none !important;
 }
+.inquiry-age-select {
+  width: min(100%, 24rem);
+  min-height: 3.25rem;
+  margin-inline: auto;
+  padding-inline: 1rem 2.75rem;
+  border: 1px solid #333 !important;
+  border-radius: 0.75rem;
+}
 option {
   color: white !important;
 }

@@ -18,11 +18,11 @@ const formQuestion = [
     question: "Age Range?",
     type: "select",
     options: [
-      { id: "18-24", name: "18-24", image: "baby" },
-      { id: "25-34", name: "25-34", image: "adult" },
-      { id: "35-44", name: "35-44", image: "bearded" },
-      { id: "45-54", name: "45-54", image: "senior" },
-      { id: "55+", name: "55+", image: "senior" },
+      { id: "18-24", name: "18-24" },
+      { id: "25-34", name: "25-34" },
+      { id: "35-44", name: "35-44" },
+      { id: "45-54", name: "45-54" },
+      { id: "55+", name: "55+" },
     ],
   },
   {
@@ -234,11 +234,17 @@ export default function Inquiry({ setIsRegistering, setInquiryData }) {
           )}
 
           {step === 1 && (
-            <OptionCards
-              options={formQuestion[step].options}
-              selected={formData.ageRange || []}
-              setSelected={(values) => handleChange("ageRange", values)}
-            />
+            <select
+              className="form-select inquiry-age-select"
+              aria-label="Age range"
+              value={Array.isArray(formData.ageRange) ? formData.ageRange[0] || "" : formData.ageRange || ""}
+              onChange={(event) => handleChange("ageRange", event.target.value)}
+            >
+              <option value="" disabled>Select your age range</option>
+              {formQuestion[step].options.map((option) => (
+                <option key={option.id} value={option.id}>{option.name}</option>
+              ))}
+            </select>
           )}
 
           {step === 2 && (
