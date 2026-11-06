@@ -36,7 +36,7 @@ const formQuestion = [
     type: "select",
     options: [
       { id: "lose-fat", name: "Lose Fat", image: "flame" },
-      { id: "build-muscle", name: "Build Muscle", imageSrc: "build-muscle-png.png" },
+      { id: "build-muscle", name: "Build Muscle", imageSrc: "build-muscle-png.png", imageScale: 2 },
       { id: "gain-strength", name: "Gain Strength", image: "barbell" },
       { id: "improve-endurance", name: "Improve Endurance", image: "runner" },
       { id: "general-health", name: "General Health", image: "medical" },
@@ -84,7 +84,7 @@ const formQuestion = [
     type: "multiselect",
     options: [
       { id: "barbell", name: "Barbell", image: "barbell" },
-      { id: "dumbbells", name: "Dumbbells", image: "flexed-arm" },
+      { id: "dumbbells", name: "Dumbbells", imageSrc: "dumbell-svg.png", imageScale: 1.8 },
       { id: "machines", name: "Machines", image: "settings" },
       { id: "cable", name: "Cable Machine", image: "link" },
       { id: "pullup", name: "Pull-up Bar", image: "pullup" },
@@ -98,13 +98,12 @@ const formQuestion = [
     question: "What muscle groups do you prioritize?",
     type: "multiselect",
     options: [
-      { id: "chest", name: "Chest", image: "muscle-chest" },
-      { id: "back", name: "Back", image: "muscle-back" },
-      { id: "shoulders", name: "Shoulders", image: "muscle-shoulders" },
-      { id: "arms", name: "Arms", image: "muscle-arms" },
-      { id: "legs", name: "Legs", image: "muscle-legs" },
-      { id: "core", name: "Core", image: "muscle-core" },
-      { id: "full-body", name: "Full Body", image: "muscle-full-body" },
+      { id: "chest", name: "Chest", imageSrc: "muscle-png.png" },
+      { id: "back", name: "Back", imageSrc: "back-png.png" },
+      { id: "shoulders", name: "Shoulders", imageSrc: "shoulder-transparent.png" },
+      { id: "arms", name: "Arms", imageSrc: "bicep-transparent.png" },
+      { id: "legs", name: "Legs", imageSrc: "legs-png.png" },
+      { id: "core", name: "Core", imageSrc: "abs-png.png" },
     ],
   },
   {
@@ -142,6 +141,7 @@ function OptionCards({ options, selected, setSelected }) {
                 src={`${import.meta.env.BASE_URL}${option.imageSrc}`}
                 alt=""
                 aria-hidden="true"
+                style={{ "--image-scale": option.imageScale || 1 }}
               />
             ) : (
               <Icon name={option.image} size={42} />
