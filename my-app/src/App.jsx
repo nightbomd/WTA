@@ -134,7 +134,7 @@ const WorkoutHistoryCard = ({ workout, onEdit, onDelete }) => {
 function MainLoad({ fade }) {
   return <>
     <div className={`loader ${fade ? 'fade-out' : ''}`} style={{ background: "black", display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-      <img src={`${import.meta.env.BASE_URL}app-logo.png`} alt="Logo"></img>
+      <img src={`${import.meta.env.BASE_URL}app-logo-transparent.png`} alt="Logo"></img>
     </div>
 
   </>;
@@ -466,10 +466,6 @@ function App() {
       setOpenSignUp={setOpenSignUp}
       onContinueWithoutAccount={handleContinueWithoutAccount}
       onSignedIn={handleSignedIn}
-      onPreviewInquiry={() => {
-        setIsRegistering(false);
-        setOpenSignUp(false);
-      }}
     />;
   }
 

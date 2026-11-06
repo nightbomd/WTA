@@ -224,7 +224,7 @@ export default function Inquiry({ setIsRegistering, setInquiryData }) {
       <main className="container p-5 col-sm-8 col-md-5 col-lg-5 text-center inquiry-page">
         <h1 className="inquiry-heading">Let&apos;s get you <span style={{ color: "#3592f5ff" }}>started</span>.</h1>
         <div className="logo text-center">
-          <img style={{ width: '100px', height: '100px', margin: '0 auto' }} src={`${import.meta.env.BASE_URL}app-logo.png`} alt="Logo"></img>
+          <img style={{ width: '100px', height: '100px', margin: '0 auto' }} src={`${import.meta.env.BASE_URL}app-logo-transparent.png`} alt="Logo"></img>
         </div>
         <ProgressBar text={`Step ${step + 1} of ${formQuestion.length}`} bg="#007bff" value={Math.floor(((step + 1) / formQuestion.length) * 100)} />
         <div className="question-container py-5">

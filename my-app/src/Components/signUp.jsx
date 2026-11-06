@@ -2,7 +2,7 @@ import { useState } from "react";
 import { auth } from "../firebase.js";
 import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 
-export default function SignUp({ openSignUp, setOpenSignUp, setUser, onContinueWithoutAccount, onSignedIn, onPreviewInquiry }) {
+export default function SignUp({ openSignUp, setOpenSignUp, setUser, onContinueWithoutAccount, onSignedIn }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
@@ -67,7 +67,7 @@ export default function SignUp({ openSignUp, setOpenSignUp, setUser, onContinueW
             <div className="signup-card text-center">
 
                 <img
-                    src={`${import.meta.env.BASE_URL}app-logo.png`}
+                    src={`${import.meta.env.BASE_URL}app-logo-transparent.png`}
                     alt="Logo"
                     className="signup-logo"
                 />
@@ -147,13 +147,6 @@ export default function SignUp({ openSignUp, setOpenSignUp, setUser, onContinueW
                         }}
                     >
                         Continue Without an Account
-                    </button>
-                    <button
-                        type="button"
-                        className="btn btn-outline-info w-100"
-                        onClick={onPreviewInquiry}
-                    >
-                        Preview Inquiry (Test)
                     </button>
                     {errorMessage && <p className="text-danger mb-0" role="alert">{errorMessage}</p>}
 
