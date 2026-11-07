@@ -476,17 +476,25 @@ option {
 }
 .loader {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
 
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: clamp(1.5rem, 6vw, 4rem);
 
-  background-color: white;
+  background-color: black;
   z-index: 9999;
+}
+.loader__logo {
+  display: block;
+  width: clamp(8rem, 42vw, 18rem);
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 .loader.fade-out {
   opacity: 0;

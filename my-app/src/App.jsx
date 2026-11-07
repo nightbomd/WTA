@@ -22,7 +22,7 @@ const toLocalDateStr = (date) => {
   const day = String(d.getDate()).padStart(2, '0');
   return `${y}-${m}-${day}`;
 };
-
+// formats the date
 const formatDisplayDate = (dateStr) => {
   const [y, m, d] = dateStr.split('-').map(Number);
   return new Date(y, m - 1, d).toLocaleDateString('en-US', {
@@ -39,6 +39,7 @@ const weekdays = [
   "Saturday",
   "Sunday"
 ];
+// uniqeu colors for the type of workout that was chosen 
 const TYPE_COLORS = {
   Push: { bg: 'var(--span-red)', color: 'var(--color-red)' },
   Pull: { bg: 'rgba(59,130,246,.15)', color: 'var(--color-blue)' },
@@ -50,9 +51,11 @@ const TYPE_COLORS = {
   Custom: { bg: 'rgba(148,163,184,.15)', color: '#94a3b8' },
 };
 
+
 const typeStyle = (type) =>
   TYPE_COLORS[type] || { bg: 'rgba(148,163,184,.15)', color: '#94a3b8' };
 
+// retrieves inquiry data from localStorage, returns an empty object if not found or on error
 const getLocalInquiryData = () => {
   try {
     const saved = localStorage.getItem('inquiryData');
@@ -131,6 +134,7 @@ const WorkoutHistoryCard = ({ workout, onEdit, onDelete }) => {
   );
 };
 
+// main load is the function that is shown while the data loads, includes the logo
 function MainLoad({ fade }) {
   return <>
     <div className={`loader ${fade ? 'fade-out' : ''}`} style={{ background: "black", display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -139,7 +143,7 @@ function MainLoad({ fade }) {
 
   </>;
 }
-
+// styles for the history card
 const histStyles = {
   editBtn: {
     padding: '8px 18px', background: 'rgba(95, 139, 210, 0.07)',
@@ -168,6 +172,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [fade, setFade] = useState(false);
   const [user, setUser] = useState(null);
+  const [authChecked, setAuthChecked] = useState(false);
   const [openSignUp, setOpenSignUp] = useState(true);
   const [isGuestMode, setIsGuestMode] = useState(false);
   const [workoutsLoadedForUser, setWorkoutsLoadedForUser] = useState(null);
@@ -299,6 +304,7 @@ function App() {
         console.error("Error fetching user data:", error);
         setIsRegistering(false);
         setWorkoutLog([]);
+        setWorkoutsLoadedForUser(user.uid);
       }
     };
 
@@ -431,14 +437,16 @@ function App() {
 };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        console.log("User UID:", user.uid);
-        setUser(user);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        console.log("User UID:", currentUser.uid);
+        setUser(currentUser);
       } else {
         console.log("No user");
         setUser(null);
       }
+
+      setAuthChecked(true);
     });
 
     return unsubscribe;
@@ -453,6 +461,15 @@ function App() {
   const displayWorkout = workoutsOnDate[0] || null;
   console.log(displayWorkout)
   const isToday = selectedDate === today;
+
+  const isResolvingSession =
+    !authChecked || Boolean(user && workoutsLoadedForUser !== user.uid);
+
+  // Keep startup behind the logo until Firebase has resolved the saved session
+  // and any signed-in user's Firestore data has finished loading.
+  if (loading || isResolvingSession) {
+    return <MainLoad fade={!isResolvingSession && fade} />;
+  }
 
   if (!isRegistered && (user || !openSignUp)) {
     return <Inquiry setIsRegistering={setIsRegistering} setInquiryData={setInquiryData} />;
@@ -471,7 +488,6 @@ function App() {
 
   return (
     <>
-      {loading && <MainLoad fade={fade} />}
       {showProfile ? (
         <DataStats inquiryData={inquiryData} setInquiryData={setInquiryData} onBack={() => { setShowProfile(false); setActiveNavItem("Home"); }} />
       ) : showSettings ? (
