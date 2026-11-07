@@ -11,6 +11,7 @@ import Settings from "./Components/settings";
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { auth, db } from "./firebase.js";
 import { deleteField, doc, getDoc, setDoc } from "firebase/firestore";
+import { loadCredentials } from '@anthropic-ai/sdk/core/credentials.mjs'
 
 // --- Helpers ---
 // Returns YYYY-MM-DD in LOCAL time (not UTC)
@@ -51,6 +52,26 @@ const TYPE_COLORS = {
   Custom: { bg: 'rgba(148,163,184,.15)', color: '#94a3b8' },
 };
 
+function Streak() {
+    const [streak, setStreak] =  useState(0);
+
+    useEffect(() => {
+      const date = toLocalDateStr(new Date());
+      const isCompleted = workoutLog.some((workout) => {
+        workout.date === today;
+      })
+
+      if (isCompleted) {
+        setStreak(prev => prev + 1);
+      }
+    }, [workoutLog]);
+
+    return (
+        <div className="streak-container">
+            <h2>Current Streak: {streak}</h2>
+        </div>
+    )
+}
 
 const typeStyle = (type) =>
   TYPE_COLORS[type] || { bg: 'rgba(148,163,184,.15)', color: '#94a3b8' };
@@ -137,8 +158,12 @@ const WorkoutHistoryCard = ({ workout, onEdit, onDelete }) => {
 // main load is the function that is shown while the data loads, includes the logo
 function MainLoad({ fade }) {
   return <>
-    <div className={`loader ${fade ? 'fade-out' : ''}`} style={{ background: "black", display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-      <img src={`${import.meta.env.BASE_URL}app-logo-transparent.png`} alt="Logo"></img>
+    <div className={`loader ${fade ? 'fade-out' : ''}`}>
+      <img
+        className="loader__logo"
+        src={`${import.meta.env.BASE_URL}app-logo-transparent.png`}
+        alt="WTA"
+      />
     </div>
 
   </>;
@@ -465,9 +490,13 @@ function App() {
   const isResolvingSession =
     !authChecked || Boolean(user && workoutsLoadedForUser !== user.uid);
 
-  // Keep startup behind the logo until Firebase has resolved the saved session
-  // and any signed-in user's Firestore data has finished loading.
-  if (loading || isResolvingSession) {
+  const shouldShowMainLoad =
+    !authChecked || Boolean(user && (loading || workoutsLoadedForUser !== user.uid));
+
+  // Briefly cover authentication resolution so returning users never see the
+  // sign-up screen, then keep the loader visible while their homepage data loads.
+  // Once Firebase confirms there is no user, show sign-up without the timed delay.
+  if (shouldShowMainLoad) {
     return <MainLoad fade={!isResolvingSession && fade} />;
   }
 
