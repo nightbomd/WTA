@@ -187,6 +187,7 @@ const StepNameType = ({ data, onChange }) => {
 // --- Exercise Card ---
 const ExerciseCard = ({ exercise, onUpdate, onRemove }) => {
   const [open, setOpen] = useState(true);
+  const [changeBodyBuildToCardio, setChangeBodyBuildToCardio] = useState(false);
   return (
     <div style={S.card}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: open ? 14 : 0 }}>
