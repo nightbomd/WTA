@@ -18,14 +18,16 @@ export default defineConfig({
         background_color: '#111111',
         icons: [
           {
-            src: '/app.logo.png',
+            src: '/app-logo.png',
             sizes: '192x192',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any'
           },
           {
-            src: '/app.logo.png',
+            src: '/app-logo.png',
             sizes: '512x512',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any'
           }
         ]
       }

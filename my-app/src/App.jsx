@@ -11,7 +11,6 @@ import Settings from "./Components/settings";
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { auth, db } from "./firebase.js";
 import { deleteField, doc, getDoc, setDoc } from "firebase/firestore";
-import { loadCredentials } from '@anthropic-ai/sdk/core/credentials.mjs'
 
 // --- Helpers ---
 // Returns YYYY-MM-DD in LOCAL time (not UTC)
@@ -52,25 +51,30 @@ const TYPE_COLORS = {
   Custom: { bg: 'rgba(148,163,184,.15)', color: '#94a3b8' },
 };
 
-function Streak() {
-    const [streak, setStreak] =  useState(0);
+const calculateStreak = (workoutLog = []) => {
+  const completedDates = new Set(
+    workoutLog.map((workout) => workout.date)
+  );
 
-    useEffect(() => {
-      const date = toLocalDateStr(new Date());
-      const isCompleted = workoutLog.some((workout) => {
-        workout.date === today;
-      })
+  const currentDate = new Date();
+  let streak = 0;
 
-      if (isCompleted) {
-        setStreak(prev => prev + 1);
-      }
-    }, [workoutLog]);
+  while (completedDates.has(toLocalDateStr(currentDate))) {
+    streak += 1;
+    currentDate.setDate(currentDate.getDate() - 1);
+  }
 
-    return (
-        <div className="streak-container">
-            <h2>Current Streak: {streak}</h2>
-        </div>
-    )
+  return streak;
+};
+
+function Streak({ workoutLog = [] }) {
+  const streak = calculateStreak(workoutLog);
+
+  return (
+    <div className="streak-container">
+      <p>Current Streak: {streak}</p>
+    </div>
+  );
 }
 
 const typeStyle = (type) =>
@@ -423,10 +427,15 @@ function App() {
     setWorkoutsLoadedForUser(null);
     setIsGuestMode(false);
   };
-
+  
   const handleSaveWeight = async () => {
   const weight = String(initWeight).trim();
-
+  const today = toLocalDateStr(new Date());
+  
+  const weightEntry = {
+    weight: Number(weight),
+    date: today,
+  }
   // Validate before saving
   if (!/^\d{1,3}$/.test(weight) || Number(weight) <= 0) {
     console.error("Please enter a valid weight.");
@@ -436,6 +445,10 @@ function App() {
   const updatedInquiryData = {
     ...inquiryData,
     weight: weight,
+    weightHistory: [
+      ...(inquiryData.weightHistory ?? []),
+      weightEntry
+    ]
   };
 
   try {
@@ -515,6 +528,7 @@ function App() {
     />;
   }
 
+  const latestWeightEntry = inquiryData.weightHistory?.at(-1);
   return (
     <>
       {showProfile ? (
@@ -555,6 +569,7 @@ function App() {
                       </>
                     )}
                   </>
+                  
                 )}
               </div>
           </header>
@@ -588,6 +603,7 @@ function App() {
                     <span className="text-secondary filter-date" style={{ fontSize: 12 }}>
                       {formatDisplayDate(selectedDate)}
                     </span>
+                    <Streak workoutLog={workoutLog} />
                   </div>
               </section>
 
@@ -697,9 +713,10 @@ function App() {
               </div>
 
               {/* ── Muscle Progress + Stats ── */}
+           
               <div ref={statsSectionRef} className="dashboard-grid dashboard-grid--two dashboard-stats-section px-4 pb-4">
                 <section className="dashboard-card calorie-tracker rounded-5 p-4">
-                  <h2 className="text-light section-heading">Weight Progress</h2>
+                  <h2 className="text-light section-heading">Weight Progress {latestWeightEntry.weight} as of {latestWeightEntry.date}</h2>
                   <p className="text-secondary mb-3">
                     Log your latest weight to keep your progress and BMI current.
                   </p>
