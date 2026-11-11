@@ -716,7 +716,12 @@ function App() {
            
               <div ref={statsSectionRef} className="dashboard-grid dashboard-grid--two dashboard-stats-section px-4 pb-4">
                 <section className="dashboard-card calorie-tracker rounded-5 p-4">
-                  <h2 className="text-light section-heading">Weight Progress {latestWeightEntry.weight} as of {latestWeightEntry.date}</h2>
+                  <h2 className="text-light section-heading">
+                    Weight Progress{" "}
+                    {latestWeightEntry
+                      ? `${latestWeightEntry.weight} lbs as of ${formatDisplayDate(latestWeightEntry.date)}`
+                      : "No weight recorded"}
+                  </h2>
                   <p className="text-secondary mb-3">
                     Log your latest weight to keep your progress and BMI current.
                   </p>
