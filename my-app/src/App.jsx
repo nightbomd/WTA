@@ -808,7 +808,8 @@ function App() {
                     ) : (
                       // Group by date descending
                       Object.entries(
-                        [...workoutLog]
+                        workoutLog
+                          .slice(-10)
                           .sort((a, b) => b.date.localeCompare(a.date))
                           .reduce((acc, w) => {
                             acc[w.date] = acc[w.date] || [];
