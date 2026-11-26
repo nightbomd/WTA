@@ -72,7 +72,7 @@ function Streak({ workoutLog = [] }) {
 
   return (
     <div className="streak-container">
-      <p>Current Streak: {streak}</p>
+      <p >Current Streak: {streak}</p>
     </div>
   );
 }
@@ -214,6 +214,19 @@ function App() {
   const [initWeight, setInitWeight] = useState("");
   const [openWeightForm, setOpenWeightForm] = useState(false);
   const [bmi, setBmi] = useState(null);
+
+  const handleAccountDeleted = () => {
+  setUser(null);
+  setInquiryData({});
+  setWorkoutLog([]);
+  setWorkoutsLoadedForUser(null);
+  setIsRegistering(false);
+  setIsGuestMode(false);
+  setShowSettings(false);
+  setShowProfile(false);
+  setOpenSignUp(true);
+  setActiveNavItem("Home");
+};
 
   useEffect(() => {
     setInitWeight(inquiryData.weight ?? "");
@@ -534,7 +547,7 @@ function App() {
       {showProfile ? (
         <DataStats inquiryData={inquiryData} setInquiryData={setInquiryData} onBack={() => { setShowProfile(false); setActiveNavItem("Home"); }} />
       ) : showSettings ? (
-        <Settings onBack={() => { setShowSettings(false); setActiveNavItem("Home"); }} onSignOut={handleSignOut} user={user} />
+        <Settings onBack={() => { setShowSettings(false); setActiveNavItem("Home"); }} onSignOut={handleSignOut} user={user} onAccountDeleted={handleAccountDeleted} />
       ) : (
         <div ref={dashboardTopRef} style={{ background: 'var(--bg-color)' }} className="container-fluid app-shell">
 

@@ -1,8 +1,39 @@
 import Icon from "./icon";
 import Button from "./btn";
+import { deleteUser } from "firebase/auth";
+import { deleteDoc, doc } from "firebase/firestore";
+import { auth, db } from "../firebase";
 
 
-export default function Settings({ onBack, onSignOut, user }) {
+
+export default function Settings({ onBack, onSignOut, user, onAccountDeleted }) {
+    const handleDeleteAccount = async () => {
+        const user = auth.currentUser;
+
+        if (!user) return;
+
+        const confirmed = window.confirm(
+            "Are you sure you want to permanently delete your account?"
+        );
+
+        if (!confirmed) return;
+
+        try {
+            await deleteDoc(doc(db, "users", user.uid));
+            await deleteUser(user);
+
+            localStorage.removeItem("inquiryData");
+            onAccountDeleted?.();
+        } catch (error) {
+            console.error("Account deletion failed:", error);
+
+            if (error.code === "auth/requires-recent-login") {
+                alert("Please sign out, sign back in, and try again.");
+            } else {
+                alert("Account deletion failed. Please try again.");
+            }
+        }
+    };
     return (
         <main className="profile-page">
             <button
@@ -43,6 +74,7 @@ export default function Settings({ onBack, onSignOut, user }) {
                         <p>Delete your account and its saved workout data.</p>
                     </div>
                     <Button
+                        onClick={handleDeleteAccount}
                         text="Delete Account"
                         bg="#1c1c1c"
                         color="#ef4444"

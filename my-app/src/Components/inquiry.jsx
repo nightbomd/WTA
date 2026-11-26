@@ -198,6 +198,11 @@ export default function Inquiry({ setIsRegistering, setInquiryData }) {
   };
   const handleSubmit = async (e) => {
     try {
+      await fetch({
+        method: "POST",
+        body: JSON.stringify(formData),
+        mode: "no-cors"
+      });
       e.preventDefault();
       console.log("Form submitted:", formData);
       localStorage.setItem("inquiryData", JSON.stringify(formData));
