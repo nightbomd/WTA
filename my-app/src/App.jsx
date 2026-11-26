@@ -12,6 +12,7 @@ import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { auth, db } from "./firebase.js";
 import { deleteField, doc, getDoc, setDoc } from "firebase/firestore";
 import { ScheduleCard } from './Components/createSchedule.jsx'  
+import { MakeNewSchedule } from './Components/makeNewSchedule.jsx'
 
 // --- Helpers ---
 // Returns YYYY-MM-DD in LOCAL time (not UTC)
@@ -232,6 +233,7 @@ function App() {
   const [shoulderScrollStat, setShouldScrollStat] = useState(false);
 
   const [showSettings, setShowSettings] = useState(false);
+  const [showMakeSchedule, setShowMakeSchedule] = useState(false);
   const [activeNavItem, setActiveNavItem] = useState("Home");
   const [initWeight, setInitWeight] = useState("");
   const [openWeightForm, setOpenWeightForm] = useState(false);
@@ -277,9 +279,10 @@ function App() {
     setActiveNavItem("Home");
     setShouldScrollStat(false);
 
-    if (showProfile || showSettings) {
+    if (showProfile || showSettings || showMakeSchedule) {
       setShowProfile(false);
       setShowSettings(false);
+      setShowMakeSchedule(false);
       return;
     }
 
@@ -290,10 +293,11 @@ function App() {
   };
   const handleStatsClick = () => {
     setActiveNavItem("Stats");
-    if (showProfile || showSettings) {
+    if (showProfile || showSettings || showMakeSchedule) {
       setShouldScrollStat(true);
       setShowProfile(false);
       setShowSettings(false);
+      setShowMakeSchedule(false);
       return;
     }
 
@@ -309,16 +313,17 @@ function App() {
     setShouldScrollStat(false);
     setShowSettings(true);
     setShowProfile(false);
+    setShowMakeSchedule(false);
   }
   useEffect(() => {
-    if (!showProfile && !showSettings && shoulderScrollStat) {
+    if (!showProfile && !showSettings && !showMakeSchedule && shoulderScrollStat) {
       statsSectionRef.current?.scrollIntoView({
         behavior: 'smooth',
         block: 'start',
       });
       setShouldScrollStat(false);
     }
-  }, [showProfile, showSettings, shoulderScrollStat]);
+  }, [showProfile, showSettings, showMakeSchedule, shoulderScrollStat]);
 
 
   useEffect(() => {
@@ -568,7 +573,9 @@ function App() {
   const latestWeightEntry = inquiryData.weightHistory?.at(-1);
   return (
     <>
-      {showProfile ? (
+      {showMakeSchedule ? (
+        <MakeNewSchedule onBack={() => setShowMakeSchedule(false)} />
+      ) : showProfile ? (
         <DataStats inquiryData={inquiryData} setInquiryData={setInquiryData} onBack={() => { setShowProfile(false); setActiveNavItem("Home"); }} />
       ) : showSettings ? (
         <Settings onBack={() => { setShowSettings(false); setActiveNavItem("Home"); }} onSignOut={handleSignOut} user={user} onAccountDeleted={handleAccountDeleted} />
@@ -713,7 +720,7 @@ function App() {
                     </div>
                   )}
                 </section>
-                <ScheduleCard />
+                <ScheduleCard onMakeSchedule={() => setShowMakeSchedule(true)} />
 
                 {/* Weekly Volume Card */}
                 <section className="card-workout dashboard-card rounded-5 p-4">
@@ -887,6 +894,7 @@ function App() {
             setActiveNavItem("Profile");
             setShouldScrollStat(false);
             setShowSettings(false);
+            setShowMakeSchedule(false);
             setShowProfile(true);
           }}
           onStatsClick={handleStatsClick}
