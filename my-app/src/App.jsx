@@ -11,6 +11,7 @@ import Settings from "./Components/settings";
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import { auth, db } from "./firebase.js";
 import { deleteField, doc, getDoc, setDoc } from "firebase/firestore";
+import { ScheduleCard } from './Components/createSchedule.jsx'  
 
 // --- Helpers ---
 // Returns YYYY-MM-DD in LOCAL time (not UTC)
@@ -52,18 +53,39 @@ const TYPE_COLORS = {
 };
 
 const calculateStreak = (workoutLog = []) => {
+  // Create a Set containing each date that has at least one completed workout.
+  // A Set automatically removes duplicate dates when multiple workouts happen on the same day.
   const completedDates = new Set(
-    workoutLog.map((workout) => workout.date)
+    workoutLog
+      // Get the saved date from every workout.
+      .map((workout) => workout.date)
+      // Remove missing dates so they cannot interfere with the calculation.
+      .filter(Boolean)
   );
 
+  // Start by checking today's local date.
   const currentDate = new Date();
-  let streak = 0;
 
-  while (completedDates.has(toLocalDateStr(currentDate))) {
-    streak += 1;
+  // If the user has not worked out today yet, begin checking from yesterday.
+  // This keeps an existing streak active throughout the current day.
+  if (!completedDates.has(toLocalDateStr(currentDate))) {
+    // Move the date back by one calendar day.
     currentDate.setDate(currentDate.getDate() - 1);
   }
 
+  // Store the number of consecutive workout days found.
+  let streak = 0;
+
+  // Continue while the date being checked has a completed workout.
+  while (completedDates.has(toLocalDateStr(currentDate))) {
+    // Count the completed day as part of the streak.
+    streak += 1;
+
+    // Move backward one day so the previous date can be checked next.
+    currentDate.setDate(currentDate.getDate() - 1);
+  }
+
+  // Return the final number of consecutive completed workout days.
   return streak;
 };
 
@@ -393,7 +415,9 @@ function App() {
         prev.map(w => w.id === editingWorkout.id ? { ...workout, id: w.id, date: w.date } : w)
       );
     } else {
-      const newWorkout = { ...workout, id: Date.now(), date: today };
+      // Save a new workout under the date selected in the date filter.
+      // This allows past workouts to count toward the correct streak dates.
+      const newWorkout = { ...workout, id: Date.now(), date: selectedDate };
       setWorkoutLog(prev => [...prev, newWorkout]);
     }
     setEditingWorkout(null);
@@ -689,6 +713,7 @@ function App() {
                     </div>
                   )}
                 </section>
+                <ScheduleCard />
 
                 {/* Weekly Volume Card */}
                 <section className="card-workout dashboard-card rounded-5 p-4">
