@@ -23,7 +23,7 @@ const searchQuery = [
   { muscle: "Biceps", keywords: ["Barbell Curl", "DB Curl", "Hammer Curl", "Preacher Curl", "Cable Curl", "Concentration Curl", "Incline DB Curl", "Spider Curl"] },
   { muscle: "Triceps", keywords: ["Tricep Dip", "Skull Crusher", "Overhead Tricep Extension", "Cable Pushdown", "Close Grip Bench", "Diamond Push-Up", "Kickback"] },
   { muscle: "Quads", keywords: ["Squat", "Leg Press", "Hack Squat", "Leg Extension", "Bulgarian Split Squat", "Lunge", "Front Squat", "Goblet Squat", "Kettlebell Swing"] },
-  { muscle: "Hamstrings", keywords: ["Romanian Deadlift", "Leg Curl", "Nordic Curl", "Good Morning", "Stiff Leg Deadlift", "Glute Ham Raise", "Sumo Deadlift"] },
+  { muscle: "Hamstrings", keywords: ["Hamstring Curl", "Romanian Deadlift", "Leg Curl", "Nordic Curl", "Good Morning", "Stiff Leg Deadlift", "Glute Ham Raise", "Sumo Deadlift"] },
   { muscle: "Glutes", keywords: ["Hip Thrust", "Glute Bridge", "Cable Kickback", "Step Up", "Sumo Squat", "Donkey Kick", "Abductor Machine"] },
   { muscle: "Core", keywords: ["Plank", "Crunch", "Cable Crunch", "Hanging Leg Raise", "Ab Wheel", "Russian Twist", "Decline Sit-Up", "Pallof Press"] },
   { muscle: "Calves", keywords: ["Standing Calf Raise", "Seated Calf Raise", "Leg Press Calf Raise", "Single Leg Calf Raise", "Donkey Calf Raise"] },
