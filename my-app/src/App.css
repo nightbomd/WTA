@@ -184,6 +184,180 @@ textarea {
   transform: translateY(-2px);
 }
 
+.schedule-focus-list {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1.75rem;
+  text-align: left;
+}
+
+.schedule-focus-card {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.75fr) minmax(220px, 1.25fr);
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #161616;
+  border: 1px solid #353535;
+  border-radius: 16px;
+}
+
+.schedule-focus-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin: 0;
+}
+
+.schedule-focus-day {
+  color: #f3f3f3;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.schedule-focus-hint {
+  color: #8f8f8f;
+  font-size: 0.78rem;
+}
+
+.schedule-focus-select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0.7rem 2.5rem 0.7rem 0.85rem;
+  color: #f1f1f1;
+  background-color: #222;
+  border: 1px solid #484848;
+  border-radius: 10px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.schedule-focus-select:focus {
+  border-color: #69a7ff;
+  outline: 3px solid rgba(37, 100, 183, 0.25);
+}
+
+.schedule-review-list {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1.75rem;
+  text-align: left;
+}
+
+.schedule-review-card {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.65fr) minmax(220px, 1.35fr);
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  background: #161616;
+  border: 1px solid #353535;
+  border-radius: 16px;
+}
+
+.schedule-review-card h3 {
+  margin: 0.2rem 0 0;
+  color: #f3f3f3;
+  font-size: 1.05rem;
+}
+
+.schedule-review-label {
+  display: block;
+  color: #858585;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.schedule-review-focus {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+
+.schedule-review-badge,
+.schedule-review-missing {
+  display: inline-flex;
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+.schedule-review-badge {
+  color: #dceaff;
+  background: rgba(37, 100, 183, 0.22);
+  border: 1px solid rgba(105, 167, 255, 0.38);
+}
+
+.schedule-review-missing {
+  color: #b8b8b8;
+  background: #232323;
+  border: 1px solid #444;
+}
+
+.schedule-save-status {
+  display: flex;
+  min-height: 360px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.schedule-save-status h2 {
+  margin: 0.5rem 0 0;
+  color: #f3f3f3;
+}
+
+.schedule-save-status p {
+  max-width: 360px;
+  margin: 0;
+  color: #929292;
+}
+
+.schedule-save-spinner,
+.schedule-save-check {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+}
+
+.schedule-save-spinner {
+  border: 5px solid #303030;
+  border-top-color: #69a7ff;
+  animation: schedule-spin 0.8s linear infinite;
+}
+
+.schedule-save-check {
+  display: grid;
+  place-items: center;
+  color: #dceaff;
+  background: rgba(37, 100, 183, 0.22);
+  border: 2px solid #69a7ff;
+}
+
+.schedule-save-check svg {
+  width: 34px;
+  height: 34px;
+}
+
+.schedule-save-check path {
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@keyframes schedule-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .schedule-actions {
   display: flex;
   gap: 0.75rem;
@@ -205,6 +379,16 @@ textarea {
     min-height: 78px;
     padding: 14px 10px;
     font-size: 0.9rem;
+  }
+
+  .schedule-focus-card {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .schedule-review-card {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
   }
 }
 
