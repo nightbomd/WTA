@@ -319,6 +319,11 @@ textarea {
   color: #929292;
 }
 
+.schedule-save-status .schedule-dashboard-button {
+  width: min(100%, 280px);
+  margin-top: 0.75rem;
+}
+
 .schedule-save-spinner,
 .schedule-save-check {
   width: 64px;

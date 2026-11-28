@@ -38,7 +38,7 @@ const steps = [
     }
 ]
 
-export function MakeNewSchedule({ onCreate, workoutDays }) {
+export function MakeNewSchedule({ onBack, workoutDays }) {
     const [schedule, setSchedule] = useState([]);
     const [step, setStep] = useState(0);
     const [saving, setSaving] = useState(false);
@@ -127,6 +127,11 @@ export function MakeNewSchedule({ onCreate, workoutDays }) {
                         </span>
                         <h2>Schedule saved</h2>
                         <p>Your weekly workout schedule is ready.</p>
+                        <Button
+                            text="Back to dashboard"
+                            className="schedule-dashboard-button"
+                            onClick={onBack}
+                        />
                     </div>
                 </section>
             </main>
